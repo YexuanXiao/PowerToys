@@ -1415,6 +1415,7 @@ pcb
 pch
 PCIDLIST
 PCWSTR
+Pdb
 pdb
 pdbonly
 pdfpreviewhandler
@@ -1969,6 +1970,7 @@ toggleswitch
 Toolchain
 toolkitcontrols
 toolkitconverters
+Toolset
 toolset
 toolstrip
 toolwindow
