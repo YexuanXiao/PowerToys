@@ -2069,7 +2069,6 @@ utf
 utils
 uuidof
 uwp
-UWPUI
 uxtheme
 UYVY
 validmodulename
