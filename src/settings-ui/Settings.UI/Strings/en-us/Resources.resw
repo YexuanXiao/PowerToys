@@ -5299,6 +5299,9 @@ To record a specific window, enter the hotkey with the Alt key in the opposite m
   <data name="LightSwitch_LocationWarningBar.Message" xml:space="preserve">
     <value>Sync your location so Light Switch can calculate the correct sunrise- and sunset times</value>
   </data>
+  <data name="LightSwitch_ApplyDarkModeExpander.Header" xml:space="preserve">
+    <value>Apply dark mode to</value>
+  </data>
   <data name="LightSwitch_ApplyDarkModeExpander.Description" xml:space="preserve">
     <value>Pick which parts of your PC should follow Light Switch</value>
   </data>
@@ -5343,9 +5346,6 @@ To record a specific window, enter the hotkey with the Alt key in the opposite m
   </data>
   <data name="LightSwitch_SunsetTooltip.Text" xml:space="preserve">
     <value>Sunset</value>
-  </data>
-  <data name="LightSwitch_ApplyDarkModeExpander.Header" xml:space="preserve">
-    <value>Apply dark mode to</value>
   </data>
   <data name="LightSwitch_WallpaperExpander.Header" xml:space="preserve">
     <value>Wallpaper changes with the system UI</value>

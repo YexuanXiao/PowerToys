@@ -159,7 +159,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             }
             else if (ViewModel.ScheduleMode == "SunriseToSunsetGeo")
             {
-                ViewModel.SyncButtonInformation = $"{ViewModel.Latitude}�, {ViewModel.Longitude}�";
+                ViewModel.SyncButtonInformation = $"{ViewModel.Latitude}°, {ViewModel.Longitude}°";
             }
 
             SunriseModeChartState();
