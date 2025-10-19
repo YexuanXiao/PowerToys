@@ -10,7 +10,7 @@
     <ClCompile Include="trace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThemeHelper.cpp">
+    <ClCompile Include="..\common\ThemeHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -24,7 +24,7 @@
     <ClInclude Include="trace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThemeHelper.h">
+    <ClInclude Include="..\common\ThemeHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

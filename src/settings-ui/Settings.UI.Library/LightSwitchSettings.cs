@@ -60,6 +60,10 @@ namespace Settings.UI.Library
                     Latitude = new StringProperty(Properties.Latitude.Value),
                     Longitude = new StringProperty(Properties.Longitude.Value),
                     ToggleThemeHotkey = new KeyboardKeysProperty(Properties.ToggleThemeHotkey.Value),
+                    WallpaperEnabled = new BoolProperty(Properties.WallpaperEnabled.Value),
+                    WallpaperStyle = new IntProperty((int)Properties.WallpaperStyle.Value),
+                    LightWallpaperPath = new StringProperty(Properties.LightWallpaperPath.Value),
+                    DarkWallpaperPath = new StringProperty(Properties.DarkWallpaperPath.Value),
                 },
             };
         }

@@ -1,5 +1,8 @@
 #include <windows.h>
 #include "ThemeHelper.h"
+#include <array>
+#include <string>
+#include <wil/resource.h>
 
 // Controls changing the themes.
 
@@ -78,4 +81,65 @@ bool GetCurrentAppsTheme()
     }
 
     return value == 1; // true = light, false = dark
+}
+
+std::array<std::wstring, 2u> getStyleValue(int style) noexcept
+{
+    switch (style)
+    {
+    case 0: // Fill
+        return { L"10", L"0" };
+    case 1: // Fit
+        return { L"6", L"0" };
+    case 2: // Stretch
+        return { L"2", L"0" };
+    case 3: // Tile
+        return { L"0", L"1" };
+    case 4: // Center
+        return { L"0", L"0" };
+    case 5: // Span
+        return { L"22", L"0" };
+    default:
+        std::terminate();
+    }
+}
+
+bool SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
+{
+    auto [styleValue, tileValue] = getStyleValue(style);
+    HKEY hKey{};
+
+    auto closeKey = wil::scope_exit([&hKey]() {
+        if (RegCloseKey(hKey) != ERROR_SUCCESS)
+        {
+            std::terminate();
+        }
+    });
+
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_WRITE, &hKey) != ERROR_SUCCESS)
+    {
+        return false;
+    }
+
+    if (RegSetValueExW(hKey, L"Wallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
+    {
+        return false;
+    }
+    if (RegSetValueExW(hKey, L"WallpaperStyle", 0, REG_SZ, reinterpret_cast<const BYTE*>(styleValue.data()), static_cast<DWORD>(styleValue.size() + 1u)) != ERROR_SUCCESS)
+    {
+        return false;
+    }
+
+    if (RegSetValueExW(hKey, L"TileWallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(tileValue.data()), static_cast<DWORD>(tileValue.size() + 1u)) != ERROR_SUCCESS)
+    {
+        return false;
+    }
+
+    // notify the system about the change
+    if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) == 0)
+    {
+        return false;
+    }
+
+    return true;
 }

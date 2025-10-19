@@ -10,5 +10,9 @@ enum class SettingId
     Sunrise_Offset,
     Sunset_Offset,
     ChangeSystem,
-    ChangeApps
+    ChangeApps,
+    WallpaperEnabled,
+    WallpaperStyle,
+    LightWallpaperPath,
+    DarkWallpaperPath
 };

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -15,6 +16,7 @@ using Microsoft.PowerToys.Settings.UI.Helpers;
 using Microsoft.PowerToys.Settings.UI.Library;
 using Microsoft.PowerToys.Settings.UI.Library.Helpers;
 using Microsoft.PowerToys.Settings.UI.SerializationContext;
+using Microsoft.UI.Xaml.Media;
 using Newtonsoft.Json.Linq;
 using Settings.UI.Library;
 using Settings.UI.Library.Helpers;
@@ -507,6 +509,129 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
+        public bool IsWallpaperEnabled
+        {
+            get
+            {
+                return ModuleSettings.Properties.WallpaperEnabled.Value;
+            }
+
+            set
+            {
+                if (ModuleSettings.Properties.WallpaperEnabled.Value != value)
+                {
+                    if (!value | _isLightWallpaperValid && _isDarkWallpaperValid)
+                    {
+                        ModuleSettings.Properties.WallpaperEnabled.Value = value;
+                    }
+
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public string LightWallpaperPath
+        {
+            get
+            {
+                return ModuleSettings.Properties.LightWallpaperPath.Value;
+            }
+
+            set
+            {
+                if (ModuleSettings.Properties.LightWallpaperPath.Value != value)
+                {
+                    ModuleSettings.Properties.LightWallpaperPath.Value = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public string DarkWallpaperPath
+        {
+            get
+            {
+                return ModuleSettings.Properties.DarkWallpaperPath.Value;
+            }
+
+            set
+            {
+                if (ModuleSettings.Properties.DarkWallpaperPath.Value != value)
+                {
+                    ModuleSettings.Properties.DarkWallpaperPath.Value = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsLightWallpaperValid
+        {
+            get => _isLightWallpaperValid;
+
+            set
+            {
+                if (_isLightWallpaperValid != value)
+                {
+                    _isLightWallpaperValid = value;
+
+                    // NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsDarkWallpaperValid
+        {
+            get => _isDarkWallpaperValid;
+            set
+            {
+                if (_isDarkWallpaperValid != value)
+                {
+                    _isDarkWallpaperValid = value;
+
+                    // NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public ImageSource LightWallpaperSource
+        {
+            get => _lightWallpaperSource;
+            set
+            {
+                if (_lightWallpaperSource != value)
+                {
+                    _lightWallpaperSource = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public ImageSource DarkWallpaperSource
+        {
+            get => _darkWallpaperSource;
+            set
+            {
+                if (_darkWallpaperSource != value)
+                {
+                    _darkWallpaperSource = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int WallpaperStyle
+        {
+            get => ModuleSettings.Properties.WallpaperStyle.Value;
+            set
+            {
+                if (ModuleSettings.Properties.WallpaperStyle.Value != value)
+                {
+                    ModuleSettings.Properties.WallpaperStyle.Value = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         private bool _enabledStateIsGPOConfigured;
         private bool _enabledGPOConfiguration;
         private LightSwitchSettings _moduleSettings;
@@ -514,6 +639,10 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
         private HotkeySettings _toggleThemeHotkey;
         private TimeSpan? _sunriseTimeSpan;
         private TimeSpan? _sunsetTimeSpan;
+        private bool _isLightWallpaperValid;
+        private bool _isDarkWallpaperValid;
+        private ImageSource _lightWallpaperSource;
+        private ImageSource _darkWallpaperSource;
 
         public ICommand ForceLightCommand { get; }
 

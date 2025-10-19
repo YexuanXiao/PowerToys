@@ -17,6 +17,10 @@ namespace Microsoft.PowerToys.Settings.UI.Library
         public const string DefaultLatitude = "0.0";
         public const string DefaultLongitude = "0.0";
         public const string DefaultScheduleMode = "FixedHours";
+        public const bool DefaultWallpaperEnabled = false;
+        public const int DefaultWallpaperStyle = 0;
+        public const string DefaultLightWallpaperPath = "";
+        public const string DefaultDarkWallpaperPath = "";
         public static readonly HotkeySettings DefaultToggleThemeHotkey = new HotkeySettings(true, true, false, true, 0x44); // Ctrl+Win+Shift+D
 
         public LightSwitchProperties()
@@ -30,6 +34,10 @@ namespace Microsoft.PowerToys.Settings.UI.Library
             SunriseOffset = new IntProperty(DefaultSunriseOffset);
             SunsetOffset = new IntProperty(DefaultSunsetOffset);
             ScheduleMode = new StringProperty(DefaultScheduleMode);
+            WallpaperEnabled = new BoolProperty(DefaultWallpaperEnabled);
+            WallpaperStyle = new IntProperty(DefaultWallpaperStyle);
+            LightWallpaperPath = new StringProperty(DefaultLightWallpaperPath);
+            DarkWallpaperPath = new StringProperty(DefaultDarkWallpaperPath);
             ToggleThemeHotkey = new KeyboardKeysProperty(DefaultToggleThemeHotkey);
         }
 
@@ -62,5 +70,17 @@ namespace Microsoft.PowerToys.Settings.UI.Library
 
         [JsonPropertyName("toggle-theme-hotkey")]
         public KeyboardKeysProperty ToggleThemeHotkey { get; set; }
+
+        [JsonPropertyName("wallpaperEnabled")]
+        public BoolProperty WallpaperEnabled { get; set; }
+
+        [JsonPropertyName("wallpaperStyle")]
+        public IntProperty WallpaperStyle { get; set; }
+
+        [JsonPropertyName("lightWallpaperPath")]
+        public StringProperty LightWallpaperPath { get; set; }
+
+        [JsonPropertyName("darkWallpaperPath")]
+        public StringProperty DarkWallpaperPath { get; set; }
     }
 }

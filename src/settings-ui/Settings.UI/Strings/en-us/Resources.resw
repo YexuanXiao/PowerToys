@@ -5299,9 +5299,6 @@ To record a specific window, enter the hotkey with the Alt key in the opposite m
   <data name="LightSwitch_LocationWarningBar.Message" xml:space="preserve">
     <value>Sync your location so Light Switch can calculate the correct sunrise- and sunset times</value>
   </data>
-  <data name="LightSwitch_ApplyDarkModeExpander.Header" xml:space="preserve">
-    <value>Apply dark mode to</value>
-  </data>
   <data name="LightSwitch_ApplyDarkModeExpander.Description" xml:space="preserve">
     <value>Pick which parts of your PC should follow Light Switch</value>
   </data>
@@ -5346,6 +5343,39 @@ To record a specific window, enter the hotkey with the Alt key in the opposite m
   </data>
   <data name="LightSwitch_SunsetTooltip.Text" xml:space="preserve">
     <value>Sunset</value>
+  </data>
+  <data name="LightSwitch_ApplyDarkModeExpander.Header" xml:space="preserve">
+    <value>Apply dark mode to</value>
+  </data>
+  <data name="LightSwitch_WallpaperExpander.Header" xml:space="preserve">
+    <value>Wallpaper changes with the system UI</value>
+  </data>
+  <data name="LightSwitch_StyleFill.Content" xml:space="preserve">
+    <value>Fill</value>
+  </data>
+  <data name="LightSwitch_StyleFit.Content" xml:space="preserve">
+    <value>Fit</value>
+  </data>
+  <data name="LightSwitch_StyleStretch.Content" xml:space="preserve">
+    <value>Stretch</value>
+  </data>
+  <data name="LightSwitch_StyleTile.Content" xml:space="preserve">
+    <value>Tile</value>
+  </data>
+  <data name="LightSwitch_StyleCenter.Content" xml:space="preserve">
+    <value>Center</value>
+  </data>
+  <data name="LightSwitch_StyleSpan.Content" xml:space="preserve">
+    <value>Span</value>
+  </data>
+  <data name="LightSwitch_ButtonLight.Content" xml:space="preserve">
+    <value>Choose the wallpaper for Light mode</value>
+  </data>
+  <data name="LightSwitch_ButtonDark.Content" xml:space="preserve">
+    <value>Choose the wallpaper for Dark mode</value>
+  </data>
+  <data name="LightSwitch_WallpaperStyle.Header" xml:space="preserve">
+    <value>Choose a fit for your desktop image</value>
   </data>
   <data name="Close_NavViewItem.Content" xml:space="preserve">
     <value>Close PowerToys</value>

@@ -51,7 +51,6 @@
                         HeaderIcon="{ui:FontIcon Glyph=&#xE823;}"
                         IsExpanded="True">
                         <ComboBox
-                            x:Name="ModeSelector"
                             AutomationProperties.AutomationId="ModeSelection_LightSwitch"
                             SelectedValue="{x:Bind ViewModel.ScheduleMode, Mode=TwoWay}"
                             SelectedValuePath="Tag"
@@ -148,6 +147,43 @@
                                         x:Uid="LightSwitch_AppsCheckbox"
                                         AutomationProperties.AutomationId="ChangeAppsCheckbox_LightSwitch"
                                         IsChecked="{x:Bind ViewModel.ChangeApps, Mode=TwoWay}" />
+                                </tkcontrols:SettingsCard>
+                            </tkcontrols:SettingsExpander.Items>
+                        </tkcontrols:SettingsExpander>
+                        <tkcontrols:SettingsExpander x:Uid="LightSwitch_WallpaperExpander"
+                            HeaderIcon="{ui:FontIcon Glyph=&#xE7f9;}"
+                            IsExpanded="True">
+                            <ToggleSwitch IsOn="{x:Bind ViewModel.IsWallpaperEnabled, Mode=TwoWay}"/>
+                            <tkcontrols:SettingsExpander.Items>
+                                <tkcontrols:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Left">
+                                    <Grid Loaded="Wallpaper_Loaded">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="20px" />
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="20px" />
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Grid.Row="0" Grid.Column="0" Tag="Light" Source="{x:Bind ViewModel.LightWallpaperSource, Mode=OneWay}"/>
+                                        <Image Grid.Row="0" Grid.Column="2" Tag="Dark" Source="{x:Bind ViewModel.DarkWallpaperSource,Mode=OneWay}"/>
+                                        <Button Grid.Row="2" Grid.Column="0" Tag="Light" x:Uid="LightSwitch_ButtonLight" Click="PickWallpaper_Click"/>
+                                        <Button Grid.Row="2" Grid.Column="2" Tag="Dark" x:Uid="LightSwitch_ButtonDark" Click="PickWallpaper_Click"/>
+                                    </Grid>
+                                </tkcontrols:SettingsCard>
+                                <tkcontrols:SettingsCard x:Uid="LightSwitch_WallpaperStyle">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <ComboBox SelectedIndex="{x:Bind ViewModel.WallpaperStyle, Mode=TwoWay}">
+                                            <ComboBoxItem x:Uid="LightSwitch_StyleFill"/>
+                                            <ComboBoxItem x:Uid="LightSwitch_StyleFit"/>
+                                            <ComboBoxItem x:Uid="LightSwitch_StyleStretch"/>
+                                            <ComboBoxItem x:Uid="LightSwitch_StyleTile"/>
+                                            <ComboBoxItem x:Uid="LightSwitch_StyleCenter"/>
+                                            <ComboBoxItem x:Uid="LightSwitch_StyleSpan"/>
+                                        </ComboBox>
+                                    </StackPanel>
                                 </tkcontrols:SettingsCard>
                             </tkcontrols:SettingsExpander.Items>
                         </tkcontrols:SettingsExpander>

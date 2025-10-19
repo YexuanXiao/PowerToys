@@ -146,7 +146,6 @@ static void update_sun_times(auto& settings)
         std::wstring wmsg(e.what(), e.what() + strlen(e.what()));
         Logger::error(L"[LightSwitchService] Exception during sun time update: {}", wmsg);
     }
-    
 }
 
 DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
@@ -195,6 +194,19 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
                 SetSystemTheme(false);
             if (settings.changeApps && isAppsCurrentlyLight)
                 SetAppsTheme(false);
+        }
+
+        if (settings.wallpaperEnabled && settings.changeSystem)
+        {
+            std::wstring wallpaperPath = !isSystemCurrentlyLight ? settings.lightWallpaperPath : settings.darkWallpaperPath;
+            if (SetWallpaperViaRegistry(wallpaperPath, settings.wallpaperStyle))
+            {
+                Logger::info(L"[LightSwitchService] Wallpaper changed.");
+            }
+            else
+            {
+                Logger::error(L"[LightSwitchService] Failed to set wallpaper.");
+            }
         }
     };
 
@@ -278,15 +290,14 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         DWORD wait = WaitForMultipleObjects(count, waits, FALSE, msToNextMinute);
         if (wait == WAIT_OBJECT_0)
         {
-            Logger::info(L"[LightSwitchService] Stop event triggered — exiting worker loop.");
+            Logger::info(L"[LightSwitchService] Stop event triggered ï¿½ exiting worker loop.");
             break;
         }
         if (hParent && wait == WAIT_OBJECT_0 + 1) // parent process exited
         {
-            Logger::info(L"[LightSwitchService] Parent process exited — stopping service.");
+            Logger::info(L"[LightSwitchService] Parent process exited ï¿½ stopping service.");
             break;
         }
-
     }
 
     if (hManualOverride)

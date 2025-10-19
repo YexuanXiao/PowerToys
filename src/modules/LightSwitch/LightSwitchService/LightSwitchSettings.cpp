@@ -159,6 +159,46 @@ void LightSwitchSettings::LoadSettings()
                 NotifyObservers(SettingId::ChangeApps);
             }
         }
+
+        if (const auto jsonVal = values.get_bool_value(L"wallpaperEnabled"))
+        {
+            auto val = *jsonVal;
+            if (m_settings.wallpaperEnabled != val)
+            {
+                m_settings.wallpaperEnabled = val;
+                NotifyObservers(SettingId::WallpaperEnabled);
+            }
+        }
+
+        if (const auto jsonVal = values.get_int_value(L"wallpaperStyle"))
+        {
+            auto val = *jsonVal;
+            if (m_settings.wallpaperStyle != val)
+            {
+                m_settings.wallpaperStyle = val;
+                NotifyObservers(SettingId::WallpaperStyle);
+            }
+        }
+
+        if (const auto jsonVal = values.get_string_value(L"lightWallpaperPath"))
+        {
+            auto val = *jsonVal;
+            if (m_settings.lightWallpaperPath != val)
+            {
+                m_settings.lightWallpaperPath = val;
+                NotifyObservers(SettingId::LightWallpaperPath);
+            }
+        }
+
+        if (const auto jsonVal = values.get_string_value(L"darkWallpaperPath"))
+        {
+            auto val = *jsonVal;
+            if (m_settings.darkWallpaperPath != val)
+            {
+                m_settings.darkWallpaperPath = val;
+                NotifyObservers(SettingId::DarkWallpaperPath);
+            }
+        }
     }
     catch (...)
     {

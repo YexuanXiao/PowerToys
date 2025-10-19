@@ -83,6 +83,10 @@ struct ModuleSettings
     int m_sunset_offset = 0;
     std::wstring m_latitude = L"0.0";
     std::wstring m_longitude = L"0.0";
+    bool m_wallpaper = false;
+    int m_wallpaper_style = 0;
+    std::wstring m_light_wallpaper_path;
+    std::wstring m_dark_wallpaper_path;
 } g_settings;
 
 class LightSwitchInterface : public PowertoyModuleIface
@@ -317,6 +321,22 @@ public:
             {
                 g_settings.m_longitude = *v;
             }
+            if (auto v = values.get_bool_value(L"wallpaperEnabled"))
+            {
+                g_settings.m_wallpaper = *v;
+            }
+            if (auto v = values.get_int_value(L"wallpaperStyle"))
+            {
+                g_settings.m_wallpaper_style = *v;
+            }
+            if (auto v = values.get_string_value(L"lightWallpaperPath"))
+            {
+                g_settings.m_light_wallpaper_path = *v;
+            }
+            if (auto v = values.get_string_value(L"darkWallpaperPath"))
+            {
+                g_settings.m_dark_wallpaper_path = *v;
+            }
 
             values.save_to_settings_file();
         }
@@ -476,6 +496,19 @@ public:
                     SetEvent(m_manual_override_event_handle);
                     Logger::debug(L"[Light Switch] Manual override event set");
                 }
+
+                if (g_settings.m_wallpaper)
+                {
+                    std::wstring wallpaperPath = GetCurrentSystemTheme() ? g_settings.m_light_wallpaper_path : g_settings.m_dark_wallpaper_path;
+                    if (SetWallpaperViaRegistry(wallpaperPath, g_settings.m_wallpaper_style))
+                    {
+                        Logger::info(L"[LightSwitchService] Wallpaper changed.");
+                    }
+                    else
+                    {
+                        Logger::error(L"[LightSwitchService] Failed to set wallpaper.");
+                    }
+                }
             }
 
             return true;
@@ -546,6 +579,14 @@ void LightSwitchInterface::init_settings()
             g_settings.m_latitude = *v;
         if (auto v = settings.get_string_value(L"longitude"))
             g_settings.m_longitude = *v;
+        if (auto v = settings.get_bool_value(L"wallpaperEnabled"))
+            g_settings.m_wallpaper = *v;
+        if (auto v = settings.get_int_value(L"wallpaperStyle"))
+            g_settings.m_wallpaper_style = *v;
+        if (auto v = settings.get_string_value(L"lightWallpaperPath"))
+            g_settings.m_light_wallpaper_path = *v;
+        if (auto v = settings.get_string_value(L"darkWallpaperPath"))
+            g_settings.m_dark_wallpaper_path = *v;
 
         Logger::info(L"[Light Switch] init_settings: loaded successfully");
     }

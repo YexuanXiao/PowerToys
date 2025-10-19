@@ -17,15 +17,21 @@ using Microsoft.PowerToys.Settings.UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.Windows.Storage.Pickers;
 using PowerToys.GPOWrapper;
 using Settings.UI.Library;
 using Settings.UI.Library.Helpers;
 using Windows.Devices.Geolocation;
 using Windows.Services.Maps;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Button = Microsoft.UI.Xaml.Controls.Button;
 
 namespace Microsoft.PowerToys.Settings.UI.Views
 {
-    public sealed partial class LightSwitchPage : Page
+    public sealed partial class LightSwitchPage : Microsoft.UI.Xaml.Controls.Page
     {
         private readonly string _appName = "LightSwitch";
         private readonly SettingsUtils _settingsUtils;
@@ -128,7 +134,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
                 ViewModel.SelectedCity = null;
 
                 // CityAutoSuggestBox.Text = string.Empty;
-                ViewModel.SyncButtonInformation = $"{ViewModel.Latitude}°, {ViewModel.Longitude}°";
+                ViewModel.SyncButtonInformation = $"{ViewModel.Latitude}ï¿½, {ViewModel.Longitude}ï¿½";
 
                 // ViewModel.CityTimesText = $"Sunrise: {result.SunriseHour}:{result.SunriseMinute:D2}\n" + $"Sunset: {result.SunsetHour}:{result.SunsetMinute:D2}";
                 SyncButton.IsEnabled = true;
@@ -153,7 +159,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             }
             else if (ViewModel.ScheduleMode == "SunriseToSunsetGeo")
             {
-                ViewModel.SyncButtonInformation = $"{ViewModel.Latitude}°, {ViewModel.Longitude}°";
+                ViewModel.SyncButtonInformation = $"{ViewModel.Latitude}ï¿½, {ViewModel.Longitude}ï¿½";
             }
 
             SunriseModeChartState();
@@ -320,6 +326,96 @@ namespace Microsoft.PowerToys.Settings.UI.Views
         private async void LocationDialog_Opened(ContentDialog sender, ContentDialogOpenedEventArgs args)
         {
             await GetGeoLocation();
+        }
+
+        private async Task FlushImage()
+        {
+            if (!string.IsNullOrEmpty(ViewModel.LightWallpaperPath))
+            {
+                var lightImage = new BitmapImage();
+                var lightFile = await StorageFile.GetFileFromPathAsync(ViewModel.LightWallpaperPath);
+                try
+                {
+                    await lightImage.SetSourceAsync(await lightFile.OpenReadAsync()); // thrown here when the image is invalid
+                    ViewModel.LightWallpaperSource = lightImage;
+                    ViewModel.IsLightWallpaperValid = true;
+                }
+                catch (Exception)
+                {
+                    ViewModel.LightWallpaperPath = null;
+                    ViewModel.IsLightWallpaperValid = false;
+                    ViewModel.LightWallpaperSource = null;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(ViewModel.DarkWallpaperPath))
+            {
+                var darkImage = new BitmapImage();
+                var darkFile = await StorageFile.GetFileFromPathAsync(ViewModel.DarkWallpaperPath);
+                try
+                {
+                    await darkImage.SetSourceAsync(await darkFile.OpenReadAsync());
+                    ViewModel.DarkWallpaperSource = darkImage;
+                    ViewModel.IsDarkWallpaperValid = true;
+                }
+                catch (Exception)
+                {
+                    ViewModel.DarkWallpaperPath = null;
+                    ViewModel.IsDarkWallpaperValid = false;
+                    ViewModel.DarkWallpaperSource = null;
+                }
+            }
+        }
+
+        private async void PickWallpaper_Click(object sender, RoutedEventArgs e)
+        {
+            var tag = (sender as Button).Tag as string;
+
+            var fileOpenPicker = new FileOpenPicker((sender as Button).XamlRoot.ContentIslandEnvironment.AppWindowId);
+            fileOpenPicker.FileTypeFilter.Add(".png");
+            fileOpenPicker.FileTypeFilter.Add(".jpg");
+            fileOpenPicker.FileTypeFilter.Add(".jpeg");
+            fileOpenPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            var selectedFile = await fileOpenPicker.PickSingleFileAsync();
+
+            if (selectedFile == null)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(ViewModel.LightWallpaperPath) && tag == "Light")
+            {
+                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.LightWallpaperPath);
+                await oldFile.DeleteAsync();
+            }
+            else if (!string.IsNullOrEmpty(ViewModel.DarkWallpaperPath) && tag == "Dark")
+            {
+                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.DarkWallpaperPath);
+                await oldFile.DeleteAsync();
+            }
+
+            var image = new BitmapImage();
+            var srcFile = await StorageFile.GetFileFromPathAsync(selectedFile.Path);
+            var settingsFolder = await StorageFolder.GetFolderFromPathAsync(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Microsoft\\PowerToys\\LightSwitch");
+            var dstFile = await settingsFolder.CreateFileAsync(tag + srcFile.FileType, CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteBufferAsync(dstFile, await FileIO.ReadBufferAsync(srcFile));
+            image.SetSource(await dstFile.OpenReadAsync());
+
+            if (tag == "Light")
+            {
+                ViewModel.LightWallpaperPath = dstFile.Path;
+            }
+            else if (tag == "Dark")
+            {
+                ViewModel.DarkWallpaperPath = dstFile.Path;
+            }
+
+            await FlushImage();
+        }
+
+        private async void Wallpaper_Loaded(object sender, RoutedEventArgs e)
+        {
+            await FlushImage();
         }
     }
 }
