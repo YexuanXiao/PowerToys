@@ -499,7 +499,7 @@ public:
 
                 if (g_settings.m_wallpaper)
                 {
-                    std::wstring const& wallpaperPath = !GetCurrentSystemTheme() ? g_settings.m_light_wallpaper_path : g_settings.m_dark_wallpaper_path;
+                    std::wstring const& wallpaperPath = GetCurrentSystemTheme() ? g_settings.m_light_wallpaper_path : g_settings.m_dark_wallpaper_path;
                     if (SetWallpaperViaRegistry(wallpaperPath, g_settings.m_wallpaper_style))
                     {
                         Logger::info(L"[LightSwitchService] Wallpaper changed.");
