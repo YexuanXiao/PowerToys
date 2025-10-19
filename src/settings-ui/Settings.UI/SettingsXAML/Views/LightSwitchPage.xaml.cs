@@ -345,6 +345,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
                     ViewModel.LightWallpaperPath = null;
                     ViewModel.IsLightWallpaperValid = false;
                     ViewModel.LightWallpaperSource = null;
+                    ViewModel.IsWallpaperEnabled = false;
                 }
             }
 
@@ -363,6 +364,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
                     ViewModel.DarkWallpaperPath = null;
                     ViewModel.IsDarkWallpaperValid = false;
                     ViewModel.DarkWallpaperSource = null;
+                    ViewModel.IsWallpaperEnabled = false;
                 }
             }
         }
