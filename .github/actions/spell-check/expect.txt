@@ -638,6 +638,7 @@ HIBYTE
 hicon
 HIDEREADONLY
 HIDEWINDOW
+hif
 Hif
 HIMAGELIST
 himl
@@ -795,6 +796,7 @@ jpe
 jpnime
 Jsons
 jsonval
+jxl
 jxr
 keybd
 KEYBDDATA
