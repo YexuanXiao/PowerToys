@@ -298,7 +298,6 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
             Logger::info(L"[LightSwitchService] Parent process exited  stopping service.");
             break;
         }
-
     }
 
     if (hManualOverride)

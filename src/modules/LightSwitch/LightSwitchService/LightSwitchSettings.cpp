@@ -61,7 +61,6 @@ void LightSwitchSettings::LoadSettings()
         PowerToysSettings::PowerToyValues values =
             PowerToysSettings::PowerToyValues::load_from_settings_file(L"LightSwitch");
 
-
         if (const auto jsonVal = values.get_string_value(L"scheduleMode"))
         {
             auto val = *jsonVal;
@@ -118,7 +117,7 @@ void LightSwitchSettings::LoadSettings()
         }
 
         // Offset
-        if (const auto jsonVal = values.get_int_value(L"sunrise_offset")) 
+        if (const auto jsonVal = values.get_int_value(L"sunrise_offset"))
         {
             auto val = *jsonVal;
             if (m_settings.sunrise_offset != val)
