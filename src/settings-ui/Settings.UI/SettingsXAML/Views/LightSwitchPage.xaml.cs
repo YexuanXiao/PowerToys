@@ -374,9 +374,12 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             var tag = (sender as Button).Tag as string;
 
             var fileOpenPicker = new FileOpenPicker((sender as Button).XamlRoot.ContentIslandEnvironment.AppWindowId);
-            fileOpenPicker.FileTypeFilter.Add(".png");
-            fileOpenPicker.FileTypeFilter.Add(".jpg");
-            fileOpenPicker.FileTypeFilter.Add(".jpeg");
+            string[] extensions = { ".jpg", ".jpeg", ".bmp", ".dib", ".png", ".jfif", ".jpe", ".gif", ".tif", ".tiff", ".wdp", ".heic", ".heif", ".heics", ".heifs", ".hif", ".avci", ".avcs", ".avif", ".avifs", ".jxr", ".jxl", ".webp" };
+            foreach (var ext in extensions)
+            {
+                fileOpenPicker.FileTypeFilter.Add(ext);
+            }
+
             fileOpenPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
             var selectedFile = await fileOpenPicker.PickSingleFileAsync();
 
