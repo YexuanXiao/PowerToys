@@ -46,18 +46,6 @@
     <OutDir>..\..\..\..\$(Platform)\$(Configuration)\$(MSBuildProjectName)\</OutDir>
     <TargetName>PowerToys.LightSwitchService</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <IncludePath>..\common;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <IncludePath>..\common;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>..\common;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\common;$(IncludePath)</IncludePath>
-  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -65,18 +53,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>
-        ./../;
-        ..\..\..\common;
-        ..\..\..\common\logger;
-        ..\..\..\common\utils;
-        ..\..\..\common\SettingsAPI;
-        ..\..\..\common\Telemetry;
-        ..\..\..\;
-        ..\..\..\..\deps\spdlog\include;
-        ./;
-        %(AdditionalIncludeDirectories)
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\LightSwitchCommon;.\..\;..\..\..\common;..\..\..\common\logger;..\..\..\common\utils;..\..\..\common\SettingsAPI;..\..\..\common\Telemetry;..\..\..\;..\..\..\..\deps\spdlog\include;./;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,7 +62,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\ThemeHelper.cpp" />
+    <ClCompile Include="..\LightSwitchCommon\ThemeHelper.cpp" />
     <ClCompile Include="LightSwitchService.cpp" />
     <ClCompile Include="LightSwitchSettings.cpp" />
     <ClCompile Include="SettingsConstants.cpp" />
@@ -96,7 +73,7 @@
     <ResourceCompile Include="LightSwitchService.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\ThemeHelper.h" />
+    <ClInclude Include="..\LightSwitchCommon\ThemeHelper.h" />
     <ClInclude Include="LightSwitchSettings.h" />
     <ClInclude Include="SettingsConstants.h" />
     <ClInclude Include="SettingsObserver.h" />

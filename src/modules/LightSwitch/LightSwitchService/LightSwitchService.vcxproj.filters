@@ -30,7 +30,7 @@
     <ClCompile Include="WinHookEventIDs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ThemeHelper.cpp">
+    <ClCompile Include="..\LightSwitchCommon\ThemeHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClInclude Include="WinHookEventIDs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\ThemeHelper.h">
+    <ClInclude Include="..\LightSwitchCommon\ThemeHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
