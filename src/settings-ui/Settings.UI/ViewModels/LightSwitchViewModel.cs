@@ -574,8 +574,11 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 if (_isLightWallpaperValid != value)
                 {
                     _isLightWallpaperValid = value;
+                }
 
-                    // NotifyPropertyChanged();
+                if (_isDarkWallpaperValid || _isLightWallpaperValid)
+                {
+                    NotifyPropertyChanged(nameof(ShowImageCard));
                 }
             }
         }
@@ -588,8 +591,11 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 if (_isDarkWallpaperValid != value)
                 {
                     _isDarkWallpaperValid = value;
+                }
 
-                    // NotifyPropertyChanged();
+                if (_isDarkWallpaperValid || _isLightWallpaperValid)
+                {
+                    NotifyPropertyChanged(nameof(ShowImageCard));
                 }
             }
         }
@@ -646,6 +652,20 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
+        public bool ShowImageCard
+        {
+            // The card is only hidden when both images do not exist when opened
+            get => _showImageCard ? true : (IsDarkWallpaperValid || IsLightWallpaperValid);
+            set
+            {
+                if (_showImageCard != value)
+                {
+                    _showImageCard = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         private bool _enabledStateIsGPOConfigured;
         private bool _enabledGPOConfiguration;
         private LightSwitchSettings _moduleSettings;
@@ -657,6 +677,7 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
         private bool _isDarkWallpaperValid;
         private ImageSource _wallpaperSourceLight;
         private ImageSource _wallpaperSourceDark;
+        private bool _showImageCard;
 
         public ICommand ForceLightCommand { get; }
 

@@ -5374,14 +5374,23 @@ To record a specific window, enter the hotkey with the Alt key in the opposite m
   <data name="LightSwitch_StyleSpan.Content" xml:space="preserve">
     <value>Span</value>
   </data>
-  <data name="LightSwitch_ButtonLight.Content" xml:space="preserve">
-    <value>Choose the wallpaper for Light mode</value>
+  <data name="LightSwitch_WallpaperBrowse.Content" xml:space="preserve">
+    <value>Browse</value>
   </data>
-  <data name="LightSwitch_ButtonDark.Content" xml:space="preserve">
-    <value>Choose the wallpaper for Dark mode</value>
+  <data name="LightSwitch_WallpaperLight.Text" xml:space="preserve">
+    <value>Light:</value>
+  </data>
+  <data name="LightSwitch_WallpaperDark.Text" xml:space="preserve">
+    <value>Dark:</value>
+  </data>
+  <data name="LightSwitch_WallpaperImageUnavailable.Text" xml:space="preserve">
+    <value>Image unavailable</value>
+  </data>
+  <data name="LightSwitch_WallpaperSelect.Header" xml:space="preserve">
+    <value>Choose images for different modes</value>
   </data>
   <data name="LightSwitch_WallpaperStyle.Header" xml:space="preserve">
-    <value>Choose a fit for your desktop image</value>
+    <value>Choose fits for your desktop images</value>
   </data>
   <data name="Close_NavViewItem.Content" xml:space="preserve">
     <value>Close PowerToys</value>

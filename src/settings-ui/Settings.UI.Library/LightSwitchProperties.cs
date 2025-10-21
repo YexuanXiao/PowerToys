@@ -37,7 +37,7 @@ namespace Microsoft.PowerToys.Settings.UI.Library
             WallpaperStyleLight = new IntProperty(DefaultWallpaperStyle);
             WallpaperStyleDark = new IntProperty(DefaultWallpaperStyle);
             WallpaperPathLight = new StringProperty(DefaultWallpaperPath);
-            WallpaperPathLight = new StringProperty(DefaultWallpaperPath);
+            WallpaperPathDark = new StringProperty(DefaultWallpaperPath);
             ToggleThemeHotkey = new KeyboardKeysProperty(DefaultToggleThemeHotkey);
         }
 
