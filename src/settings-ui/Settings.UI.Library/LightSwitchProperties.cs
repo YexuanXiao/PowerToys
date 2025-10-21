@@ -16,7 +16,7 @@ namespace Microsoft.PowerToys.Settings.UI.Library
         public const int DefaultSunsetOffset = 0;
         public const string DefaultLatitude = "0.0";
         public const string DefaultLongitude = "0.0";
-        public const string DefaultScheduleMode = "FixedHours";
+        public const string DefaultScheduleMode = "Off";
         public const bool DefaultWallpaperEnabled = false;
         public const int DefaultWallpaperStyle = 0;
         public const string DefaultLightWallpaperPath = "";
