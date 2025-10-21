@@ -5,11 +5,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ManagedCommon;
 using Microsoft.PowerToys.Settings.UI.Helpers;
@@ -17,9 +19,11 @@ using Microsoft.PowerToys.Settings.UI.Library;
 using Microsoft.PowerToys.Settings.UI.Library.Helpers;
 using Microsoft.PowerToys.Settings.UI.SerializationContext;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Newtonsoft.Json.Linq;
 using Settings.UI.Library;
 using Settings.UI.Library.Helpers;
+using Windows.Storage;
 
 namespace Microsoft.PowerToys.Settings.UI.ViewModels
 {
@@ -460,6 +464,11 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             OnPropertyChanged(nameof(Latitude));
             OnPropertyChanged(nameof(Longitude));
             OnPropertyChanged(nameof(ScheduleMode));
+            OnPropertyChanged(nameof(IsWallpaperEnabled));
+            OnPropertyChanged(nameof(WallpaperPathLight));
+            OnPropertyChanged(nameof(WallpaperPathDark));
+            OnPropertyChanged(nameof(WallpaperStyleLight));
+            OnPropertyChanged(nameof(WallpaperStyleDark));
         }
 
         private void UpdateSunTimes(double latitude, double longitude, string city = "n/a")
@@ -521,12 +530,17 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             {
                 if (ModuleSettings.Properties.WallpaperEnabled.Value != value)
                 {
+                    // Only allow enabling if two images is valid
                     if (!value | _isLightWallpaperValid && _isDarkWallpaperValid)
                     {
                         ModuleSettings.Properties.WallpaperEnabled.Value = value;
+                        NotifyPropertyChanged();
                     }
-
-                    NotifyPropertyChanged();
+                    else if (value)
+                    {
+                        ModuleSettings.Properties.WallpaperEnabled.Value = false;
+                        NotifyPropertyChanged();
+                    }
                 }
             }
         }

@@ -26,12 +26,10 @@ using Windows.Devices.Geolocation;
 using Windows.Services.Maps;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using Button = Microsoft.UI.Xaml.Controls.Button;
 
 namespace Microsoft.PowerToys.Settings.UI.Views
 {
-    public sealed partial class LightSwitchPage : Microsoft.UI.Xaml.Controls.Page
+    public sealed partial class LightSwitchPage : Page
     {
         private readonly string _appName = "LightSwitch";
         private readonly SettingsUtils _settingsUtils;
@@ -401,12 +399,10 @@ namespace Microsoft.PowerToys.Settings.UI.Views
                 await oldFile.DeleteAsync();
             }
 
-            var image = new BitmapImage();
             var srcFile = await StorageFile.GetFileFromPathAsync(selectedFile.Path);
             var settingsFolder = await StorageFolder.GetFolderFromPathAsync(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Microsoft\\PowerToys\\LightSwitch");
-            var dstFile = await settingsFolder.CreateFileAsync(tag + srcFile.FileType, CreationCollisionOption.ReplaceExisting);
+            var dstFile = await settingsFolder.CreateFileAsync($"{tag}{DateTime.Now.ToFileTime()}{srcFile.FileType}", CreationCollisionOption.ReplaceExisting);
             await FileIO.WriteBufferAsync(dstFile, await FileIO.ReadBufferAsync(srcFile));
-            image.SetSource(await dstFile.OpenReadAsync());
 
             if (tag == "Light")
             {
