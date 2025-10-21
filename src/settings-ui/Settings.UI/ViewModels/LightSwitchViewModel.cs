@@ -531,16 +531,16 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 if (ModuleSettings.Properties.WallpaperEnabled.Value != value)
                 {
                     // Only allow enabling if two images is valid
-                    if (!value | _isLightWallpaperValid && _isDarkWallpaperValid)
+                    if (value && IsLightWallpaperValid && IsDarkWallpaperValid)
                     {
-                        ModuleSettings.Properties.WallpaperEnabled.Value = value;
-                        NotifyPropertyChanged();
+                        ModuleSettings.Properties.WallpaperEnabled.Value = true;
                     }
-                    else if (value)
+                    else
                     {
                         ModuleSettings.Properties.WallpaperEnabled.Value = false;
-                        NotifyPropertyChanged();
                     }
+
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -589,11 +589,6 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 {
                     _isLightWallpaperValid = value;
                 }
-
-                if (_isDarkWallpaperValid || _isLightWallpaperValid)
-                {
-                    NotifyPropertyChanged(nameof(ShowImageCard));
-                }
             }
         }
 
@@ -605,11 +600,6 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 if (_isDarkWallpaperValid != value)
                 {
                     _isDarkWallpaperValid = value;
-                }
-
-                if (_isDarkWallpaperValid || _isLightWallpaperValid)
-                {
-                    NotifyPropertyChanged(nameof(ShowImageCard));
                 }
             }
         }
@@ -666,20 +656,6 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
-        public bool ShowImageCard
-        {
-            // The card is only hidden when both images do not exist when opened
-            get => _showImageCard ? true : (IsDarkWallpaperValid || IsLightWallpaperValid);
-            set
-            {
-                if (_showImageCard != value)
-                {
-                    _showImageCard = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
         private bool _enabledStateIsGPOConfigured;
         private bool _enabledGPOConfiguration;
         private LightSwitchSettings _moduleSettings;
@@ -691,7 +667,6 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
         private bool _isDarkWallpaperValid;
         private ImageSource _wallpaperSourceLight;
         private ImageSource _wallpaperSourceDark;
-        private bool _showImageCard;
 
         public ICommand ForceLightCommand { get; }
 

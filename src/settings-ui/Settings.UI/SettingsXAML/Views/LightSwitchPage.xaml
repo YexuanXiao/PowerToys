@@ -195,11 +195,8 @@
                                 IsExpanded="True">
                                 <ToggleSwitch AutomationProperties.AutomationId="Toggle_WallpaperSwitch" IsOn="{x:Bind ViewModel.IsWallpaperEnabled, Mode=TwoWay}" />
                                 <tkcontrols:SettingsExpander.Items>
-                                    <tkcontrols:SettingsCard
-                                        HorizontalContentAlignment="Stretch"
-                                        ContentAlignment="Left"
-                                        Visibility="{x:Bind ViewModel.ShowImageCard, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-                                        <Grid Loaded="Wallpaper_Loaded">
+                                    <tkcontrols:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Left">
+                                        <Grid HorizontalAlignment="Stretch" Loaded="Wallpaper_Loaded">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*" />
                                             </Grid.RowDefinitions>
@@ -212,6 +209,7 @@
                                                 x:Uid="LightSwitch_WallpaperImageUnavailable"
                                                 Grid.Row="0"
                                                 Grid.Column="0"
+                                                VerticalAlignment="Center"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 Visibility="{x:Bind ViewModel.IsLightWallpaperValid, Converter={StaticResource BoolToInvertedVisibilityConverter}, Mode=OneWay}" />
                                             <Image

@@ -386,8 +386,6 @@ namespace Microsoft.PowerToys.Settings.UI.Views
                 return;
             }
 
-            ViewModel.ShowImageCard = true;
-
             if (!string.IsNullOrEmpty(ViewModel.WallpaperPathLight) && tag == "Light")
             {
                 var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathLight);
