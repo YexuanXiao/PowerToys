@@ -331,15 +331,17 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             if (!string.IsNullOrEmpty(ViewModel.WallpaperPathLight))
             {
                 var lightImage = new BitmapImage();
-                var lightFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathLight);
                 try
                 {
+                    var lightFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathLight);
                     await lightImage.SetSourceAsync(await lightFile.OpenReadAsync()); // thrown here when the image is invalid
                     ViewModel.WallpaperSourceLight = lightImage;
                     ViewModel.IsLightWallpaperValid = true;
                 }
                 catch (Exception)
                 {
+                    var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
+                    await oldFile.DeleteAsync();
                     ViewModel.WallpaperPathLight = null;
                     ViewModel.IsLightWallpaperValid = false;
                     ViewModel.WallpaperSourceLight = null;
@@ -350,15 +352,17 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             if (!string.IsNullOrEmpty(ViewModel.WallpaperPathDark))
             {
                 var darkImage = new BitmapImage();
-                var darkFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
                 try
                 {
+                    var darkFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
                     await darkImage.SetSourceAsync(await darkFile.OpenReadAsync());
                     ViewModel.WallpaperSourceDark = darkImage;
                     ViewModel.IsDarkWallpaperValid = true;
                 }
                 catch (Exception)
                 {
+                    var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
+                    await oldFile.DeleteAsync();
                     ViewModel.WallpaperPathDark = null;
                     ViewModel.IsDarkWallpaperValid = false;
                     ViewModel.WallpaperSourceDark = null;
@@ -414,7 +418,7 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             await FlushImage();
         }
 
-        private async void Wallpaper_Loaded(object sender, RoutedEventArgs e)
+        private async void WallpaperImageContainer_Loaded(object sender, RoutedEventArgs e)
         {
             await FlushImage();
         }

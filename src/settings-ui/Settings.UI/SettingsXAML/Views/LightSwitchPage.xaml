@@ -196,7 +196,7 @@
                                 <ToggleSwitch AutomationProperties.AutomationId="Toggle_WallpaperSwitch" IsOn="{x:Bind ViewModel.IsWallpaperEnabled, Mode=TwoWay}" />
                                 <tkcontrols:SettingsExpander.Items>
                                     <tkcontrols:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Left">
-                                        <Grid HorizontalAlignment="Stretch" Loaded="Wallpaper_Loaded">
+                                        <Grid HorizontalAlignment="Stretch" Loaded="WallpaperImageContainer_Loaded">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*" />
                                             </Grid.RowDefinitions>
