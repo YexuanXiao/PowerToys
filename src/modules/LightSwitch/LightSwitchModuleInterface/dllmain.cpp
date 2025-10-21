@@ -560,6 +560,19 @@ public:
                     SetAppsTheme(!GetCurrentAppsTheme());
                 }
 
+                if (g_settings.m_wallpaper)
+                {
+                    std::wstring const& wallpaperPath = !current_system_theme ? g_settings.m_wallpaper_path_light : g_settings.m_wallpaper_path_dark;
+                    if (SetWallpaperViaRegistry(wallpaperPath, !current_system_theme ? g_settings.m_wallpaper_style_light : g_settings.m_wallpaper_style_dark))
+                    {
+                        Logger::info(L"[LightSwitchService] Wallpaper changed.");
+                    }
+                    else
+                    {
+                        Logger::error(L"[LightSwitchService] Failed to set wallpaper.");
+                    }
+                }
+
                 if (!m_manual_override_event_handle)
                 {
                     m_manual_override_event_handle = OpenEventW(SYNCHRONIZE | EVENT_MODIFY_STATE, FALSE, L"POWERTOYS_LIGHTSWITCH_MANUAL_OVERRIDE");
@@ -573,19 +586,6 @@ public:
                 {
                     SetEvent(m_manual_override_event_handle);
                     Logger::debug(L"[Light Switch] Manual override event set");
-                }
-
-                if (g_settings.m_wallpaper)
-                {
-                    std::wstring const& wallpaperPath = current_system_theme ? g_settings.m_wallpaper_path_light : g_settings.m_wallpaper_path_dark;
-                    if (SetWallpaperViaRegistry(wallpaperPath, current_system_theme ? g_settings.m_wallpaper_style_light : g_settings.m_wallpaper_style_dark))
-                    {
-                        Logger::info(L"[LightSwitchService] Wallpaper changed.");
-                    }
-                    else
-                    {
-                        Logger::error(L"[LightSwitchService] Failed to set wallpaper.");
-                    }
                 }
             }
 

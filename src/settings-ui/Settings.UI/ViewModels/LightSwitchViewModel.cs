@@ -656,6 +656,56 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
+        private async void WallpaperPath_Changed(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(WallpaperPathLight))
+            {
+                if (!string.IsNullOrEmpty(WallpaperPathLight))
+                {
+                    var lightImage = new BitmapImage();
+                    try
+                    {
+                        var lightFile = await StorageFile.GetFileFromPathAsync(WallpaperPathLight);
+                        await lightImage.SetSourceAsync(await lightFile.OpenReadAsync()); // thrown here when the image is invalid
+                        WallpaperSourceLight = lightImage;
+                        IsLightWallpaperValid = true;
+                    }
+                    catch (Exception)
+                    {
+                        var oldFile = await StorageFile.GetFileFromPathAsync(WallpaperPathDark);
+                        await oldFile.DeleteAsync();
+                        WallpaperPathLight = null;
+                        IsLightWallpaperValid = false;
+                        WallpaperSourceLight = null;
+                        IsWallpaperEnabled = false;
+                    }
+                }
+            }
+            else if (e.PropertyName == nameof(WallpaperPathDark))
+            {
+                if (!string.IsNullOrEmpty(WallpaperPathDark))
+                {
+                    var darkImage = new BitmapImage();
+                    try
+                    {
+                        var darkFile = await StorageFile.GetFileFromPathAsync(WallpaperPathDark);
+                        await darkImage.SetSourceAsync(await darkFile.OpenReadAsync());
+                        WallpaperSourceDark = darkImage;
+                        IsDarkWallpaperValid = true;
+                    }
+                    catch (Exception)
+                    {
+                        var oldFile = await StorageFile.GetFileFromPathAsync(WallpaperPathDark);
+                        await oldFile.DeleteAsync();
+                        WallpaperPathDark = null;
+                        IsDarkWallpaperValid = false;
+                        WallpaperSourceDark = null;
+                        IsWallpaperEnabled = false;
+                    }
+                }
+            }
+        }
+
         private bool _enabledStateIsGPOConfigured;
         private bool _enabledGPOConfiguration;
         private LightSwitchSettings _moduleSettings;
