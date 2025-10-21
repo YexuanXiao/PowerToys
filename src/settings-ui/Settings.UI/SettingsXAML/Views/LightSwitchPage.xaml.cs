@@ -330,40 +330,40 @@ namespace Microsoft.PowerToys.Settings.UI.Views
 
         private async Task FlushImage()
         {
-            if (!string.IsNullOrEmpty(ViewModel.LightWallpaperPath))
+            if (!string.IsNullOrEmpty(ViewModel.WallpaperPathLight))
             {
                 var lightImage = new BitmapImage();
-                var lightFile = await StorageFile.GetFileFromPathAsync(ViewModel.LightWallpaperPath);
+                var lightFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathLight);
                 try
                 {
                     await lightImage.SetSourceAsync(await lightFile.OpenReadAsync()); // thrown here when the image is invalid
-                    ViewModel.LightWallpaperSource = lightImage;
+                    ViewModel.WallpaperSourceLight = lightImage;
                     ViewModel.IsLightWallpaperValid = true;
                 }
                 catch (Exception)
                 {
-                    ViewModel.LightWallpaperPath = null;
+                    ViewModel.WallpaperPathLight = null;
                     ViewModel.IsLightWallpaperValid = false;
-                    ViewModel.LightWallpaperSource = null;
+                    ViewModel.WallpaperSourceLight = null;
                     ViewModel.IsWallpaperEnabled = false;
                 }
             }
 
-            if (!string.IsNullOrEmpty(ViewModel.DarkWallpaperPath))
+            if (!string.IsNullOrEmpty(ViewModel.WallpaperPathDark))
             {
                 var darkImage = new BitmapImage();
-                var darkFile = await StorageFile.GetFileFromPathAsync(ViewModel.DarkWallpaperPath);
+                var darkFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
                 try
                 {
                     await darkImage.SetSourceAsync(await darkFile.OpenReadAsync());
-                    ViewModel.DarkWallpaperSource = darkImage;
+                    ViewModel.WallpaperSourceDark = darkImage;
                     ViewModel.IsDarkWallpaperValid = true;
                 }
                 catch (Exception)
                 {
-                    ViewModel.DarkWallpaperPath = null;
+                    ViewModel.WallpaperPathDark = null;
                     ViewModel.IsDarkWallpaperValid = false;
-                    ViewModel.DarkWallpaperSource = null;
+                    ViewModel.WallpaperSourceDark = null;
                     ViewModel.IsWallpaperEnabled = false;
                 }
             }
@@ -388,14 +388,14 @@ namespace Microsoft.PowerToys.Settings.UI.Views
                 return;
             }
 
-            if (!string.IsNullOrEmpty(ViewModel.LightWallpaperPath) && tag == "Light")
+            if (!string.IsNullOrEmpty(ViewModel.WallpaperPathLight) && tag == "Light")
             {
-                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.LightWallpaperPath);
+                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathLight);
                 await oldFile.DeleteAsync();
             }
-            else if (!string.IsNullOrEmpty(ViewModel.DarkWallpaperPath) && tag == "Dark")
+            else if (!string.IsNullOrEmpty(ViewModel.WallpaperPathDark) && tag == "Dark")
             {
-                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.DarkWallpaperPath);
+                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
                 await oldFile.DeleteAsync();
             }
 
@@ -408,11 +408,11 @@ namespace Microsoft.PowerToys.Settings.UI.Views
 
             if (tag == "Light")
             {
-                ViewModel.LightWallpaperPath = dstFile.Path;
+                ViewModel.WallpaperPathLight = dstFile.Path;
             }
             else if (tag == "Dark")
             {
-                ViewModel.DarkWallpaperPath = dstFile.Path;
+                ViewModel.WallpaperPathDark = dstFile.Path;
             }
 
             await FlushImage();

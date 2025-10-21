@@ -61,9 +61,10 @@ namespace Settings.UI.Library
                     Longitude = new StringProperty(Properties.Longitude.Value),
                     ToggleThemeHotkey = new KeyboardKeysProperty(Properties.ToggleThemeHotkey.Value),
                     WallpaperEnabled = new BoolProperty(Properties.WallpaperEnabled.Value),
-                    WallpaperStyle = new IntProperty((int)Properties.WallpaperStyle.Value),
-                    LightWallpaperPath = new StringProperty(Properties.LightWallpaperPath.Value),
-                    DarkWallpaperPath = new StringProperty(Properties.DarkWallpaperPath.Value),
+                    WallpaperStyleLight = new IntProperty((int)Properties.WallpaperStyleLight.Value),
+                    WallpaperStyleDark = new IntProperty((int)Properties.WallpaperStyleDark.Value),
+                    WallpaperPathLight = new StringProperty(Properties.WallpaperPathLight.Value),
+                    WallpaperPathDark = new StringProperty(Properties.WallpaperPathDark.Value),
                 },
             };
         }

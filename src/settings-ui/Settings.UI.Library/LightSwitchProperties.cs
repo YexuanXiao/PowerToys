@@ -19,8 +19,7 @@ namespace Microsoft.PowerToys.Settings.UI.Library
         public const string DefaultScheduleMode = "Off";
         public const bool DefaultWallpaperEnabled = false;
         public const int DefaultWallpaperStyle = 0;
-        public const string DefaultLightWallpaperPath = "";
-        public const string DefaultDarkWallpaperPath = "";
+        public const string DefaultWallpaperPath = "";
         public static readonly HotkeySettings DefaultToggleThemeHotkey = new HotkeySettings(true, true, false, true, 0x44); // Ctrl+Win+Shift+D
 
         public LightSwitchProperties()
@@ -35,9 +34,10 @@ namespace Microsoft.PowerToys.Settings.UI.Library
             SunsetOffset = new IntProperty(DefaultSunsetOffset);
             ScheduleMode = new StringProperty(DefaultScheduleMode);
             WallpaperEnabled = new BoolProperty(DefaultWallpaperEnabled);
-            WallpaperStyle = new IntProperty(DefaultWallpaperStyle);
-            LightWallpaperPath = new StringProperty(DefaultLightWallpaperPath);
-            DarkWallpaperPath = new StringProperty(DefaultDarkWallpaperPath);
+            WallpaperStyleLight = new IntProperty(DefaultWallpaperStyle);
+            WallpaperStyleDark = new IntProperty(DefaultWallpaperStyle);
+            WallpaperPathLight = new StringProperty(DefaultWallpaperPath);
+            WallpaperPathLight = new StringProperty(DefaultWallpaperPath);
             ToggleThemeHotkey = new KeyboardKeysProperty(DefaultToggleThemeHotkey);
         }
 
@@ -74,13 +74,16 @@ namespace Microsoft.PowerToys.Settings.UI.Library
         [JsonPropertyName("wallpaperEnabled")]
         public BoolProperty WallpaperEnabled { get; set; }
 
-        [JsonPropertyName("wallpaperStyle")]
-        public IntProperty WallpaperStyle { get; set; }
+        [JsonPropertyName("wallpaperStyleLight")]
+        public IntProperty WallpaperStyleLight { get; set; }
 
-        [JsonPropertyName("lightWallpaperPath")]
-        public StringProperty LightWallpaperPath { get; set; }
+        [JsonPropertyName("wallpaperStyleDark")]
+        public IntProperty WallpaperStyleDark { get; set; }
 
-        [JsonPropertyName("darkWallpaperPath")]
-        public StringProperty DarkWallpaperPath { get; set; }
+        [JsonPropertyName("wallpaperPathLight")]
+        public StringProperty WallpaperPathLight { get; set; }
+
+        [JsonPropertyName("wallpaperPathDark")]
+        public StringProperty WallpaperPathDark { get; set; }
     }
 }

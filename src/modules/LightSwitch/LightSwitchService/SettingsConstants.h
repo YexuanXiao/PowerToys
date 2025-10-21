@@ -12,7 +12,8 @@ enum class SettingId
     ChangeSystem,
     ChangeApps,
     WallpaperEnabled,
-    WallpaperStyle,
-    LightWallpaperPath,
-    DarkWallpaperPath
+    WallpaperStyleLight,
+    WallpaperStyleDark,
+    WallpaperPathLight,
+    WallpaperPathDark
 };

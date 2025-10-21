@@ -180,33 +180,43 @@ void LightSwitchSettings::LoadSettings()
             }
         }
 
-        if (const auto jsonVal = values.get_int_value(L"wallpaperStyle"))
+        if (const auto jsonVal = values.get_int_value(L"wallpaperStyleLight"))
         {
             auto val = *jsonVal;
-            if (m_settings.wallpaperStyle != val)
+            if (m_settings.wallpaperStyleLight != val)
             {
-                m_settings.wallpaperStyle = val;
-                NotifyObservers(SettingId::WallpaperStyle);
+                m_settings.wallpaperStyleLight = val;
+                NotifyObservers(SettingId::WallpaperStyleLight);
             }
         }
 
-        if (const auto jsonVal = values.get_string_value(L"lightWallpaperPath"))
+        if (const auto jsonVal = values.get_int_value(L"wallpaperStyleDark"))
         {
             auto val = *jsonVal;
-            if (m_settings.lightWallpaperPath != val)
+            if (m_settings.wallpaperStyleDark != val)
             {
-                m_settings.lightWallpaperPath = val;
-                NotifyObservers(SettingId::LightWallpaperPath);
+                m_settings.wallpaperStyleDark = val;
+                NotifyObservers(SettingId::WallpaperStyleDark);
             }
         }
 
-        if (const auto jsonVal = values.get_string_value(L"darkWallpaperPath"))
+        if (const auto jsonVal = values.get_string_value(L"wallpaperPathLight"))
         {
             auto val = *jsonVal;
-            if (m_settings.darkWallpaperPath != val)
+            if (m_settings.wallpaperPathLight != val)
             {
-                m_settings.darkWallpaperPath = val;
-                NotifyObservers(SettingId::DarkWallpaperPath);
+                m_settings.wallpaperPathLight = val;
+                NotifyObservers(SettingId::WallpaperPathLight);
+            }
+        }
+
+        if (const auto jsonVal = values.get_string_value(L"wallpaperPathDark"))
+        {
+            auto val = *jsonVal;
+            if (m_settings.wallpaperPathDark != val)
+            {
+                m_settings.wallpaperPathDark = val;
+                NotifyObservers(SettingId::WallpaperPathDark);
             }
         }
     }

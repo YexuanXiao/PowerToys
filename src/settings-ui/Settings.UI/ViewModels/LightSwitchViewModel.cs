@@ -531,35 +531,35 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
-        public string LightWallpaperPath
+        public string WallpaperPathLight
         {
             get
             {
-                return ModuleSettings.Properties.LightWallpaperPath.Value;
+                return ModuleSettings.Properties.WallpaperPathLight.Value;
             }
 
             set
             {
-                if (ModuleSettings.Properties.LightWallpaperPath.Value != value)
+                if (ModuleSettings.Properties.WallpaperPathLight.Value != value)
                 {
-                    ModuleSettings.Properties.LightWallpaperPath.Value = value;
+                    ModuleSettings.Properties.WallpaperPathLight.Value = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        public string DarkWallpaperPath
+        public string WallpaperPathDark
         {
             get
             {
-                return ModuleSettings.Properties.DarkWallpaperPath.Value;
+                return ModuleSettings.Properties.WallpaperPathDark.Value;
             }
 
             set
             {
-                if (ModuleSettings.Properties.DarkWallpaperPath.Value != value)
+                if (ModuleSettings.Properties.WallpaperPathDark.Value != value)
                 {
-                    ModuleSettings.Properties.DarkWallpaperPath.Value = value;
+                    ModuleSettings.Properties.WallpaperPathDark.Value = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -594,40 +594,53 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
-        public ImageSource LightWallpaperSource
+        public ImageSource WallpaperSourceLight
         {
-            get => _lightWallpaperSource;
+            get => _wallpaperSourceLight;
             set
             {
-                if (_lightWallpaperSource != value)
+                if (_wallpaperSourceLight != value)
                 {
-                    _lightWallpaperSource = value;
+                    _wallpaperSourceLight = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        public ImageSource DarkWallpaperSource
+        public ImageSource WallpaperSourceDark
         {
-            get => _darkWallpaperSource;
+            get => _wallpaperSourceDark;
             set
             {
-                if (_darkWallpaperSource != value)
+                if (_wallpaperSourceDark != value)
                 {
-                    _darkWallpaperSource = value;
+                    _wallpaperSourceDark = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        public int WallpaperStyle
+        public int WallpaperStyleLight
         {
-            get => ModuleSettings.Properties.WallpaperStyle.Value;
+            get => ModuleSettings.Properties.WallpaperStyleLight.Value;
             set
             {
-                if (ModuleSettings.Properties.WallpaperStyle.Value != value)
+                if (ModuleSettings.Properties.WallpaperStyleLight.Value != value)
                 {
-                    ModuleSettings.Properties.WallpaperStyle.Value = value;
+                    ModuleSettings.Properties.WallpaperStyleLight.Value = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int WallpaperStyleDark
+        {
+            get => ModuleSettings.Properties.WallpaperStyleDark.Value;
+            set
+            {
+                if (ModuleSettings.Properties.WallpaperStyleDark.Value != value)
+                {
+                    ModuleSettings.Properties.WallpaperStyleDark.Value = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -642,8 +655,8 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
         private TimeSpan? _sunsetTimeSpan;
         private bool _isLightWallpaperValid;
         private bool _isDarkWallpaperValid;
-        private ImageSource _lightWallpaperSource;
-        private ImageSource _darkWallpaperSource;
+        private ImageSource _wallpaperSourceLight;
+        private ImageSource _wallpaperSourceDark;
 
         public ICommand ForceLightCommand { get; }
 

@@ -184,64 +184,97 @@
                                 </tkcontrols:SettingsExpander.Items>
                             </tkcontrols:SettingsExpander>
                             <tkcontrols:SettingsExpander
-                            x:Uid="LightSwitch_WallpaperExpander"
-                            HeaderIcon="{ui:FontIcon Glyph=&#xE7f9;}"
-                            IsExpanded="True">
-                            <ToggleSwitch AutomationProperties.AutomationId="Toggle_WallpaperSwitch" IsOn="{x:Bind ViewModel.IsWallpaperEnabled, Mode=TwoWay}" />
-                            <tkcontrols:SettingsExpander.Items>
-                                <tkcontrols:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Left">
-                                    <Grid Loaded="Wallpaper_Loaded">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*" />
-                                            <RowDefinition Height="20px" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="20px" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Image
-                                            Grid.Row="0"
-                                            Grid.Column="0"
-                                            Source="{x:Bind ViewModel.LightWallpaperSource, Mode=OneWay}"
-                                            Tag="Light" />
-                                        <Image
-                                            Grid.Row="0"
-                                            Grid.Column="2"
-                                            Source="{x:Bind ViewModel.DarkWallpaperSource, Mode=OneWay}"
-                                            Tag="Dark" />
-                                        <Button
-                                            x:Uid="LightSwitch_ButtonLight"
+                                x:Uid="LightSwitch_WallpaperExpander"
+                                HeaderIcon="{ui:FontIcon Glyph=&#xE7f9;}"
+                                IsExpanded="True">
+                                <ToggleSwitch AutomationProperties.AutomationId="Toggle_WallpaperSwitch" IsOn="{x:Bind ViewModel.IsWallpaperEnabled, Mode=TwoWay}" />
+                                <tkcontrols:SettingsExpander.Items>
+                                    <tkcontrols:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Left">
+                                        <Grid Loaded="Wallpaper_Loaded">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="20px" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Image
+                                                Grid.Row="0"
+                                                Grid.Column="0"
+                                                Source="{x:Bind ViewModel.WallpaperSourceLight, Mode=OneWay}"
+                                                Tag="Light" />
+                                            <Image
+                                                Grid.Row="0"
+                                                Grid.Column="2"
+                                                Source="{x:Bind ViewModel.WallpaperSourceDark, Mode=OneWay}"
+                                                Tag="Dark" />
+                                        </Grid>
+                                    </tkcontrols:SettingsCard>
+                                    <tkcontrols:SettingsCard
+                                        HorizontalContentAlignment="Stretch"
+                                        ContentAlignment="Left"
+                                        Header="为不同模式选择图片">
+                                        <StackPanel
                                             Grid.Row="2"
-                                            Grid.Column="0"
-                                            AutomationProperties.AutomationId="PickLight_Button"
-                                            Click="PickWallpaper_Click"
-                                            Tag="Light" />
-                                        <Button
-                                            x:Uid="LightSwitch_ButtonDark"
-                                            Grid.Row="2"
-                                            Grid.Column="2"
-                                            AutomationProperties.AutomationId="PickDark_Button"
-                                            Click="PickWallpaper_Click"
-                                            Tag="Dark" />
-                                    </Grid>
-                                </tkcontrols:SettingsCard>
-                                <tkcontrols:SettingsCard x:Uid="LightSwitch_WallpaperStyle">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <ComboBox AutomationProperties.AutomationId="Toggle_WallpaperStyleSwitch" SelectedIndex="{x:Bind ViewModel.WallpaperStyle, Mode=TwoWay}">
-                                            <ComboBoxItem x:Uid="LightSwitch_StyleFill" AutomationProperties.AutomationId="FillCBItem_StyleSwitch" />
-                                            <ComboBoxItem x:Uid="LightSwitch_StyleFit" AutomationProperties.AutomationId="FitCBItem_StyleSwitch" />
-                                            <ComboBoxItem x:Uid="LightSwitch_StyleStretch" AutomationProperties.AutomationId="StretchCBItem_StyleSwitch" />
-                                            <ComboBoxItem x:Uid="LightSwitch_StyleTile" AutomationProperties.AutomationId="TileCBItem_StyleSwitch" />
-                                            <ComboBoxItem x:Uid="LightSwitch_StyleCenter" AutomationProperties.AutomationId="CenterCBItem_StyleSwitch" />
-                                            <ComboBoxItem x:Uid="LightSwitch_StyleSpan" AutomationProperties.AutomationId="SpanCBItem_StyleSwitch" />
-                                        </ComboBox>
-                                    </StackPanel>
-                                </tkcontrols:SettingsCard>
-                            </tkcontrols:SettingsExpander.Items>
-                        </tkcontrols:SettingsExpander>
-                    </controls:SettingsGroup>
+                                            Grid.ColumnSpan="3"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="浅色：" />
+                                            <Button
+                                                Grid.Row="2"
+                                                Grid.Column="0"
+                                                AutomationProperties.AutomationId="PickLight_Button"
+                                                Click="PickWallpaper_Click"
+                                                Content="浏览"
+                                                Tag="Light" />
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="浅色：" />
+                                            <Button
+                                                Grid.Row="2"
+                                                Grid.Column="2"
+                                                AutomationProperties.AutomationId="PickDark_Button"
+                                                Click="PickWallpaper_Click"
+                                                Content="浏览"
+                                                Tag="Dark" />
+                                        </StackPanel>
+                                    </tkcontrols:SettingsCard>
+                                    <tkcontrols:SettingsCard x:Uid="LightSwitch_WallpaperStyle">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="浅色：" />
+                                            <ComboBox AutomationProperties.AutomationId="Toggle_WallpaperStyleSwitch" SelectedIndex="{x:Bind ViewModel.WallpaperStyleLight, Mode=TwoWay}">
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleFill" AutomationProperties.AutomationId="FillCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleFit" AutomationProperties.AutomationId="FitCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleStretch" AutomationProperties.AutomationId="StretchCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleTile" AutomationProperties.AutomationId="TileCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleCenter" AutomationProperties.AutomationId="CenterCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleSpan" AutomationProperties.AutomationId="SpanCBItem_StyleSwitch" />
+                                            </ComboBox>
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="深色：" />
+                                            <ComboBox AutomationProperties.AutomationId="Toggle_WallpaperStyleSwitch" SelectedIndex="{x:Bind ViewModel.WallpaperStyleDark, Mode=TwoWay}">
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleFill" AutomationProperties.AutomationId="FillCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleFit" AutomationProperties.AutomationId="FitCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleStretch" AutomationProperties.AutomationId="StretchCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleTile" AutomationProperties.AutomationId="TileCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleCenter" AutomationProperties.AutomationId="CenterCBItem_StyleSwitch" />
+                                                <ComboBoxItem x:Uid="LightSwitch_StyleSpan" AutomationProperties.AutomationId="SpanCBItem_StyleSwitch" />
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </tkcontrols:SettingsCard>
+                                </tkcontrols:SettingsExpander.Items>
+                            </tkcontrols:SettingsExpander>
+                        </controls:SettingsGroup>
                         <!--  Force mode buttons  -->
                         <!--<tkcontrols:SettingsCard
         Header="Force mode now"
