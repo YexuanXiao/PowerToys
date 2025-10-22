@@ -659,12 +659,17 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
 
         public static void DeleteFile(string path)
         {
-            try
+            // Prevent attackers from damaging files through specially crafted JSON
+            var dataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Microsoft\\PowerToys\\LightSwitch";
+            if (!string.IsNullOrEmpty(path) && path.StartsWith(dataPath, StringComparison.OrdinalIgnoreCase))
             {
-                File.Delete(path);
-            }
-            catch (Exception)
-            {
+                try
+                {
+                    File.Delete(path);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 

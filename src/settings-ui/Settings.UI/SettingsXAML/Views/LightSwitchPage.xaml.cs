@@ -348,10 +348,12 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             if (!string.IsNullOrEmpty(ViewModel.WallpaperPathLight) && tag == "Light")
             {
                 LightSwitchViewModel.DeleteFile(ViewModel.WallpaperPathLight);
+                ViewModel.WallpaperPathLight = string.Empty;
             }
             else if (!string.IsNullOrEmpty(ViewModel.WallpaperPathDark) && tag == "Dark")
             {
                 LightSwitchViewModel.DeleteFile(ViewModel.WallpaperPathDark);
+                ViewModel.WallpaperPathDark = string.Empty;
             }
 
             var srcFile = await StorageFile.GetFileFromPathAsync(selectedFile.Path);
