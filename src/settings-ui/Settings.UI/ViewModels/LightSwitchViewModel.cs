@@ -657,7 +657,7 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
-        public static async Task DeleteFile(string path)
+        public static void DeleteFile(string path)
         {
             try
             {
@@ -682,7 +682,7 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 }
                 catch (Exception)
                 {
-                    await DeleteFile(WallpaperPathLight);
+                    DeleteFile(WallpaperPathLight);
                     WallpaperPathLight = null;
                     IsLightWallpaperValid = false;
                     WallpaperSourceLight = null;
@@ -701,7 +701,7 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
                 }
                 catch (Exception)
                 {
-                    await DeleteFile(WallpaperPathDark);
+                    DeleteFile(WallpaperPathDark);
                     WallpaperPathDark = null;
                     IsDarkWallpaperValid = false;
                     WallpaperSourceDark = null;
