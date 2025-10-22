@@ -51,6 +51,7 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             };
 
             _toggleThemeHotkey = _moduleSettings.Properties.ToggleThemeHotkey.Value;
+            PropertyChanged += WallpaperPath_Changed;
         }
 
         public override Dictionary<string, HotkeySettings[]> GetAllHotkeySettings()
@@ -656,52 +657,55 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
+        public static async Task DeleteFile(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         private async void WallpaperPath_Changed(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(WallpaperPathLight))
             {
-                if (!string.IsNullOrEmpty(WallpaperPathLight))
+                var lightImage = new BitmapImage();
+                try
                 {
-                    var lightImage = new BitmapImage();
-                    try
-                    {
-                        var lightFile = await StorageFile.GetFileFromPathAsync(WallpaperPathLight);
-                        await lightImage.SetSourceAsync(await lightFile.OpenReadAsync()); // thrown here when the image is invalid
-                        WallpaperSourceLight = lightImage;
-                        IsLightWallpaperValid = true;
-                    }
-                    catch (Exception)
-                    {
-                        var oldFile = await StorageFile.GetFileFromPathAsync(WallpaperPathDark);
-                        await oldFile.DeleteAsync();
-                        WallpaperPathLight = null;
-                        IsLightWallpaperValid = false;
-                        WallpaperSourceLight = null;
-                        IsWallpaperEnabled = false;
-                    }
+                    var lightFile = await StorageFile.GetFileFromPathAsync(WallpaperPathLight);
+                    await lightImage.SetSourceAsync(await lightFile.OpenReadAsync()); // thrown here when the image is invalid
+                    WallpaperSourceLight = lightImage;
+                    IsLightWallpaperValid = true;
+                }
+                catch (Exception)
+                {
+                    await DeleteFile(WallpaperPathLight);
+                    WallpaperPathLight = null;
+                    IsLightWallpaperValid = false;
+                    WallpaperSourceLight = null;
+                    IsWallpaperEnabled = false;
                 }
             }
             else if (e.PropertyName == nameof(WallpaperPathDark))
             {
-                if (!string.IsNullOrEmpty(WallpaperPathDark))
+                var darkImage = new BitmapImage();
+                try
                 {
-                    var darkImage = new BitmapImage();
-                    try
-                    {
-                        var darkFile = await StorageFile.GetFileFromPathAsync(WallpaperPathDark);
-                        await darkImage.SetSourceAsync(await darkFile.OpenReadAsync());
-                        WallpaperSourceDark = darkImage;
-                        IsDarkWallpaperValid = true;
-                    }
-                    catch (Exception)
-                    {
-                        var oldFile = await StorageFile.GetFileFromPathAsync(WallpaperPathDark);
-                        await oldFile.DeleteAsync();
-                        WallpaperPathDark = null;
-                        IsDarkWallpaperValid = false;
-                        WallpaperSourceDark = null;
-                        IsWallpaperEnabled = false;
-                    }
+                    var darkFile = await StorageFile.GetFileFromPathAsync(WallpaperPathDark);
+                    await darkImage.SetSourceAsync(await darkFile.OpenReadAsync());
+                    WallpaperSourceDark = darkImage;
+                    IsDarkWallpaperValid = true;
+                }
+                catch (Exception)
+                {
+                    await DeleteFile(WallpaperPathDark);
+                    WallpaperPathDark = null;
+                    IsDarkWallpaperValid = false;
+                    WallpaperSourceDark = null;
+                    IsWallpaperEnabled = false;
                 }
             }
         }

@@ -5384,7 +5384,7 @@ To record a specific window, enter the hotkey with the Alt key in the opposite m
     <value>Dark:</value>
   </data>
   <data name="LightSwitch_WallpaperImageUnavailable.Text" xml:space="preserve">
-    <value>Image unavailable</value>
+    <value>Image preview unavailable, may not exist or is corrupted</value>
   </data>
   <data name="LightSwitch_WallpaperSelect.Header" xml:space="preserve">
     <value>Choose images for different modes</value>

@@ -196,7 +196,7 @@
                                 <ToggleSwitch AutomationProperties.AutomationId="Toggle_WallpaperSwitch" IsOn="{x:Bind ViewModel.IsWallpaperEnabled, Mode=TwoWay}" />
                                 <tkcontrols:SettingsExpander.Items>
                                     <tkcontrols:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Left">
-                                        <Grid HorizontalAlignment="Stretch" Loaded="WallpaperImageContainer_Loaded">
+                                        <Grid HorizontalAlignment="Stretch">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*" />
                                             </Grid.RowDefinitions>
@@ -244,7 +244,7 @@
                                                 x:Uid="LightSwitch_WallpaperBrowse"
                                                 Grid.Row="2"
                                                 Grid.Column="0"
-                                                AutomationProperties.AutomationId="PickLight_Button"
+                                                AutomationProperties.AutomationId="Pick_ButtonLight"
                                                 Click="PickWallpaper_Click"
                                                 Tag="Light" />
                                             <TextBlock
@@ -257,7 +257,7 @@
                                                 x:Uid="LightSwitch_WallpaperBrowse"
                                                 Grid.Row="2"
                                                 Grid.Column="2"
-                                                AutomationProperties.AutomationId="PickDark_Button"
+                                                AutomationProperties.AutomationId="Pick_ButtonDark"
                                                 Click="PickWallpaper_Click"
                                                 Tag="Dark" />
                                         </StackPanel>
@@ -268,7 +268,7 @@
                                                 x:Uid="LightSwitch_WallpaperLight"
                                                 VerticalAlignment="Center"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                            <ComboBox AutomationProperties.AutomationId="Toggle_WallpaperStyleSwitch" SelectedIndex="{x:Bind ViewModel.WallpaperStyleLight, Mode=TwoWay}">
+                                            <ComboBox AutomationProperties.AutomationId="Toggle_WallpaperStyleSwitchLight" SelectedIndex="{x:Bind ViewModel.WallpaperStyleLight, Mode=TwoWay}">
                                                 <ComboBoxItem x:Uid="LightSwitch_StyleFill" AutomationProperties.AutomationId="FillCBItem_StyleSwitch" />
                                                 <ComboBoxItem x:Uid="LightSwitch_StyleFit" AutomationProperties.AutomationId="FitCBItem_StyleSwitch" />
                                                 <ComboBoxItem x:Uid="LightSwitch_StyleStretch" AutomationProperties.AutomationId="StretchCBItem_StyleSwitch" />
@@ -280,7 +280,7 @@
                                                 x:Uid="LightSwitch_WallpaperDark"
                                                 VerticalAlignment="Center"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                            <ComboBox AutomationProperties.AutomationId="Toggle_WallpaperStyleSwitch" SelectedIndex="{x:Bind ViewModel.WallpaperStyleDark, Mode=TwoWay}">
+                                            <ComboBox AutomationProperties.AutomationId="Toggle_WallpaperStyleSwitchDark" SelectedIndex="{x:Bind ViewModel.WallpaperStyleDark, Mode=TwoWay}">
                                                 <ComboBoxItem x:Uid="LightSwitch_StyleFill" AutomationProperties.AutomationId="FillCBItem_StyleSwitch" />
                                                 <ComboBoxItem x:Uid="LightSwitch_StyleFit" AutomationProperties.AutomationId="FitCBItem_StyleSwitch" />
                                                 <ComboBoxItem x:Uid="LightSwitch_StyleStretch" AutomationProperties.AutomationId="StretchCBItem_StyleSwitch" />

@@ -326,51 +326,6 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             await GetGeoLocation();
         }
 
-        private async Task FlushImage()
-        {
-            if (!string.IsNullOrEmpty(ViewModel.WallpaperPathLight))
-            {
-                var lightImage = new BitmapImage();
-                try
-                {
-                    var lightFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathLight);
-                    await lightImage.SetSourceAsync(await lightFile.OpenReadAsync()); // thrown here when the image is invalid
-                    ViewModel.WallpaperSourceLight = lightImage;
-                    ViewModel.IsLightWallpaperValid = true;
-                }
-                catch (Exception)
-                {
-                    var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
-                    await oldFile.DeleteAsync();
-                    ViewModel.WallpaperPathLight = null;
-                    ViewModel.IsLightWallpaperValid = false;
-                    ViewModel.WallpaperSourceLight = null;
-                    ViewModel.IsWallpaperEnabled = false;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(ViewModel.WallpaperPathDark))
-            {
-                var darkImage = new BitmapImage();
-                try
-                {
-                    var darkFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
-                    await darkImage.SetSourceAsync(await darkFile.OpenReadAsync());
-                    ViewModel.WallpaperSourceDark = darkImage;
-                    ViewModel.IsDarkWallpaperValid = true;
-                }
-                catch (Exception)
-                {
-                    var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
-                    await oldFile.DeleteAsync();
-                    ViewModel.WallpaperPathDark = null;
-                    ViewModel.IsDarkWallpaperValid = false;
-                    ViewModel.WallpaperSourceDark = null;
-                    ViewModel.IsWallpaperEnabled = false;
-                }
-            }
-        }
-
         private async void PickWallpaper_Click(object sender, RoutedEventArgs e)
         {
             var tag = (sender as Button).Tag as string;
@@ -392,13 +347,11 @@ namespace Microsoft.PowerToys.Settings.UI.Views
 
             if (!string.IsNullOrEmpty(ViewModel.WallpaperPathLight) && tag == "Light")
             {
-                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathLight);
-                await oldFile.DeleteAsync();
+                await LightSwitchViewModel.DeleteFile(ViewModel.WallpaperPathLight);
             }
             else if (!string.IsNullOrEmpty(ViewModel.WallpaperPathDark) && tag == "Dark")
             {
-                var oldFile = await StorageFile.GetFileFromPathAsync(ViewModel.WallpaperPathDark);
-                await oldFile.DeleteAsync();
+                await LightSwitchViewModel.DeleteFile(ViewModel.WallpaperPathDark);
             }
 
             var srcFile = await StorageFile.GetFileFromPathAsync(selectedFile.Path);
@@ -414,13 +367,6 @@ namespace Microsoft.PowerToys.Settings.UI.Views
             {
                 ViewModel.WallpaperPathDark = dstFile.Path;
             }
-
-            await FlushImage();
-        }
-
-        private async void WallpaperImageContainer_Loaded(object sender, RoutedEventArgs e)
-        {
-            await FlushImage();
         }
 
         private void SunriseModeChartState()
