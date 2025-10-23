@@ -181,6 +181,21 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         bool isSystemCurrentlyLight = GetCurrentSystemTheme();
         bool isAppsCurrentlyLight = GetCurrentAppsTheme();
 
+        // Call before SetTheme to take advantage of the additional notifications they perform
+        if (settings.wallpaperEnabled && settings.changeSystem)
+        {
+            std::wstring const& wallpaperPath = isSystemCurrentlyLight ? settings.wallpaperPathLight : settings.wallpaperPathDark;
+            auto style = isSystemCurrentlyLight ? settings.wallpaperStyleLight : settings.wallpaperStyleDark;
+            if (auto e = SetWallpaperViaRegistry(wallpaperPath, style) == 0)
+            {
+                Logger::info(L"[LightSwitchService] Wallpaper changed.");
+            }
+            else
+            {
+                Logger::error(L"[LightSwitchService] Failed to set wallpaper, error: {}.", e);
+            }
+        }
+
         if (isLightActive)
         {
             if (settings.changeSystem && !isSystemCurrentlyLight)
@@ -205,19 +220,6 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
             {
                 SetAppsTheme(false);
                 Logger::info(L"[LightSwitchService] Changing apps theme to light mode.");
-            }
-        }
-
-        if (settings.wallpaperEnabled && settings.changeSystem)
-        {
-            std::wstring const& wallpaperPath = isSystemCurrentlyLight ? settings.wallpaperPathLight : settings.wallpaperPathDark;
-            if (SetWallpaperViaRegistry(wallpaperPath, isSystemCurrentlyLight ? settings.wallpaperStyleLight : settings.wallpaperStyleDark))
-            {
-                Logger::info(L"[LightSwitchService] Wallpaper changed.");
-            }
-            else
-            {
-                Logger::error(L"[LightSwitchService] Failed to set wallpaper.");
             }
         }
     };
@@ -310,7 +312,6 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
             }
         }
 
-
         // --- When schedule is active, run once per minute ---
         SYSTEMTIME st;
         GetLocalTime(&st);
@@ -390,7 +391,6 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
 
     return 0;
 }
-
 
 int APIENTRY wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {

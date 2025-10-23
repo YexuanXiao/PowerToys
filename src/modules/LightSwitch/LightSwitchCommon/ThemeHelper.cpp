@@ -62,7 +62,7 @@ void SetSystemTheme(bool mode)
         RegSetValueEx(hKey, L"SystemUsesLightTheme", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
         RegCloseKey(hKey);
 
-        if (mode) // if are changing to light mode 
+        if (mode) // if are changing to light mode
         {
             ResetColorPrevalence();
             Logger::info(L"[LightSwitchService] Reset ColorPrevalence to default when switching to light mode.");
@@ -134,42 +134,67 @@ std::array<std::wstring, 2u> getStyleValue(int style) noexcept
     }
 }
 
-bool SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
+int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
 {
-    auto [styleValue, tileValue] = getStyleValue(style);
-    HKEY hKey{};
+    HKEY hKeyDesktop{};
+    HKEY hKeyWallpapers{};
 
-    auto closeKey = wil::scope_exit([&hKey]() {
-        if (RegCloseKey(hKey) != ERROR_SUCCESS)
+    auto closeKey = wil::scope_exit([&hKeyDesktop, &hKeyWallpapers]() {
+        if (RegCloseKey(hKeyDesktop) != ERROR_SUCCESS)
+        {
+            std::terminate();
+        }
+        if (RegCloseKey(hKeyWallpapers) != ERROR_SUCCESS)
         {
             std::terminate();
         }
     });
 
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_WRITE, &hKey) != ERROR_SUCCESS)
+    auto [styleValue, tileValue] = getStyleValue(style);
+
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_WRITE, &hKeyDesktop) != ERROR_SUCCESS)
     {
-        return false;
+        return 1;
     }
 
-    if (RegSetValueExW(hKey, L"Wallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
+    if (RegSetValueExW(hKeyDesktop, L"Wallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
     {
-        return false;
-    }
-    if (RegSetValueExW(hKey, L"WallpaperStyle", 0, REG_SZ, reinterpret_cast<const BYTE*>(styleValue.data()), static_cast<DWORD>(styleValue.size() + 1u)) != ERROR_SUCCESS)
-    {
-        return false;
+        return 2;
     }
 
-    if (RegSetValueExW(hKey, L"TileWallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(tileValue.data()), static_cast<DWORD>(tileValue.size() + 1u)) != ERROR_SUCCESS)
+    if (RegSetValueExW(hKeyDesktop, L"WallpaperStyle", 0, REG_SZ, reinterpret_cast<const BYTE*>(styleValue.data()), static_cast<DWORD>(styleValue.size() + 1u)) != ERROR_SUCCESS)
     {
-        return false;
+        return 3;
+    }
+
+    if (RegSetValueExW(hKeyDesktop, L"TileWallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(tileValue.data()), static_cast<DWORD>(tileValue.size() + 1u)) != ERROR_SUCCESS)
+    {
+        return 4;
+    }
+
+    // Another wallpaper path cache
+    // If it is not executed, the wallpaper will revert after switching to another virtual desktop
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Wallpapers", 0, KEY_WRITE, &hKeyWallpapers) != ERROR_SUCCESS)
+    {
+        return 5;
+    }
+
+    if (RegSetValueExW(hKeyWallpapers, L"CurrentWallpaperPath", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
+    {
+        return 6;
+    }
+
+    DWORD backgroundType = 0; // 0 = picture, 1 = solid color, 2 = slideshow
+    if (RegSetValueExW(hKeyWallpapers, L"BackgroundType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&backgroundType), static_cast<DWORD>(sizeof(DWORD))) != ERROR_SUCCESS)
+    {
+        return 7;
     }
 
     // notify the system about the change
     if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) == 0)
     {
-        return false;
+        return 8;
     }
 
-    return true;
+    return 0;
 }

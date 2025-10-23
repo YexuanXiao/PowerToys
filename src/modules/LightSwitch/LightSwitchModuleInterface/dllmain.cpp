@@ -551,6 +551,20 @@ public:
                 bool current_system_theme = GetCurrentSystemTheme();
                 // get current will return true if in light mode; otherwise false
                 Logger::info(L"[Light Switch] Hotkey triggered: Toggle Theme");
+                if (g_settings.m_wallpaper)
+                {
+                    std::wstring const& wallpaperPath = !current_system_theme ? g_settings.m_wallpaper_path_light : g_settings.m_wallpaper_path_dark;
+                    auto style = !current_system_theme ? g_settings.m_wallpaper_style_light : g_settings.m_wallpaper_style_dark;
+                    if (auto e = SetWallpaperViaRegistry(wallpaperPath, style) == 0)
+                    {
+                        Logger::info(L"[LightSwitchService] Wallpaper changed.");
+                    }
+                    else
+                    {
+                        Logger::error(L"[LightSwitchService] Failed to set wallpaper, error: {}.", e);
+                    }
+                }
+
                 if (g_settings.m_changeSystem)
                 {
                     SetSystemTheme(!current_system_theme);
@@ -558,19 +572,6 @@ public:
                 if (g_settings.m_changeApps)
                 {
                     SetAppsTheme(!GetCurrentAppsTheme());
-                }
-
-                if (g_settings.m_wallpaper)
-                {
-                    std::wstring const& wallpaperPath = !current_system_theme ? g_settings.m_wallpaper_path_light : g_settings.m_wallpaper_path_dark;
-                    if (SetWallpaperViaRegistry(wallpaperPath, !current_system_theme ? g_settings.m_wallpaper_style_light : g_settings.m_wallpaper_style_dark))
-                    {
-                        Logger::info(L"[LightSwitchService] Wallpaper changed.");
-                    }
-                    else
-                    {
-                        Logger::error(L"[LightSwitchService] Failed to set wallpaper.");
-                    }
                 }
 
                 if (!m_manual_override_event_handle)
