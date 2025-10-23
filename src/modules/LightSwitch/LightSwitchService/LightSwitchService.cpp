@@ -16,6 +16,8 @@ SERVICE_STATUS g_ServiceStatus = {};
 SERVICE_STATUS_HANDLE g_StatusHandle = nullptr;
 HANDLE g_ServiceStopEvent = nullptr;
 static int g_lastUpdatedDay = -1;
+static ScheduleMode prevMode = ScheduleMode::Off;
+static std::wstring prevLat, prevLon;
 
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR* argv);
 VOID WINAPI ServiceCtrlHandler(DWORD dwCtrl);
@@ -219,7 +221,7 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
             if (settings.changeApps && isAppsCurrentlyLight)
             {
                 SetAppsTheme(false);
-                Logger::info(L"[LightSwitchService] Changing apps theme to light mode.");
+                Logger::info(L"[LightSwitchService] Changing apps theme to dark mode.");
             }
         }
     };
@@ -249,6 +251,23 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
 
         LightSwitchSettings::instance().LoadSettings();
         const auto& settings = LightSwitchSettings::instance().settings();
+
+        // Check for changes in schedule mode or coordinates
+        bool modeChangedToSunset = (prevMode != settings.scheduleMode &&
+                                    settings.scheduleMode == ScheduleMode::SunsetToSunrise);
+        bool coordsChanged = (prevLat != settings.latitude || prevLon != settings.longitude);
+
+        if ((modeChangedToSunset || coordsChanged) && settings.scheduleMode == ScheduleMode::SunsetToSunrise)
+        {
+            Logger::info(L"[LightSwitchService] Mode or coordinates changed, recalculating sun times.");
+            update_sun_times(settings);
+            SYSTEMTIME st;
+            GetLocalTime(&st);
+            g_lastUpdatedDay = st.wDay;
+            prevMode = settings.scheduleMode;
+            prevLat = settings.latitude;
+            prevLon = settings.longitude;
+        }
 
         // If schedule is off, idle but keep watching settings and manual override
         if (settings.scheduleMode == ScheduleMode::Off)
