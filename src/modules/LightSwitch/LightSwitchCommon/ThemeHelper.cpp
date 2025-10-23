@@ -156,13 +156,13 @@ bool GetWindowsVersionFromRegistryInternal(int& build, int& revision) noexcept
 
 bool GetWindowsVersionFromRegistry(int& build, int& revision) noexcept
 {
-    static std::atomic<int> buildCache{};
-    static std::atomic<int> revcache{};
+    static std::atomic<int> build_cache{};
+    static std::atomic<int> rev_cache{};
 
-    if (auto bld = buildCache.load(); bld != 0)
+    if (auto bld = build_cache.load(); bld != 0)
     {
         build = bld;
-        revision = revcache.load();
+        revision = rev_cache.load();
         return true;
     }
 
@@ -174,9 +174,9 @@ bool GetWindowsVersionFromRegistry(int& build, int& revision) noexcept
     }
     build = bld;
     revision = rev;
-    revcache.store(rev);
-    // Write after rev for condition
-    buildCache.store(bld);
+    rev_cache.store(rev);
+    // Write after rev_cache for condition
+    build_cache.store(bld);
     return true;
 }
 
@@ -304,21 +304,21 @@ struct __declspec(uuid("53F5CA0B-158F-4124-900C-057158060B27")) IVirtualDesktopM
     virtual HRESULT __stdcall CreateDesktop(IUnknown** desktop) = 0;
     virtual HRESULT __stdcall MoveDesktop(IUnknown* desktop, int nIndex) = 0;
     virtual HRESULT __stdcall RemoveDesktop(IUnknown* desktop, IUnknown* fallback) = 0;
-    virtual HRESULT __stdcall FindDesktop(const GUID* desktopid, IUnknown** desktop) = 0;
+    virtual HRESULT __stdcall FindDesktop(const GUID* desktopId, IUnknown** desktop) = 0;
     virtual HRESULT __stdcall GetDesktopSwitchIncludeExcludeViews(IUnknown* desktop, IObjectArray** unknown1, IObjectArray** unknown2) = 0;
     virtual HRESULT __stdcall SetDesktopName(IUnknown* desktop, HSTRING name) = 0;
     virtual HRESULT __stdcall SetDesktopWallpaper(IUnknown* desktop, HSTRING path) = 0;
     virtual HRESULT __stdcall UpdateWallpaperPathForAllDesktops(HSTRING path) = 0;
     virtual HRESULT __stdcall CopyDesktopState(IInspectable* pView0, IInspectable* pView1) = 0;
     virtual HRESULT __stdcall CreateRemoteDesktop(HSTRING path, IUnknown** desktop) = 0;
-    virtual HRESULT __stdcall SwitchRemoteDesktop(IUnknown* desktop, void* switchtype) = 0;
+    virtual HRESULT __stdcall SwitchRemoteDesktop(IUnknown* desktop, void* switchType) = 0;
     virtual HRESULT __stdcall SwitchDesktopWithAnimation(IUnknown* desktop) = 0;
     virtual HRESULT __stdcall GetLastActiveDesktop(IUnknown** desktop) = 0;
     virtual HRESULT __stdcall WaitForAnimationToComplete() = 0;
 };
 
 // Using this method to set the wallpaper works across virtual desktops, but it does not provide the functionality to set the style
-int SetWallpapaerViaIVirtualDesktopManagerInternal(const std::wstring& path) noexcept
+int SetWallpaperViaIVirtualDesktopManagerInternal(const std::wstring& path) noexcept
 {
     int build{};
     int revision{};
@@ -393,7 +393,7 @@ int SetWallpaper(const std::wstring& path, int style) noexcept
     {
         return e;
     }
-    if (auto e = SetWallpapaerViaIVirtualDesktopManagerInternal(path) != 0)
+    if (auto e = SetWallpaperViaIVirtualDesktopManagerInternal(path) != 0)
     {
         return e;
     }
