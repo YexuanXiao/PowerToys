@@ -186,7 +186,7 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         {
             std::wstring const& wallpaperPath = isSystemCurrentlyLight ? settings.wallpaperPathLight : settings.wallpaperPathDark;
             auto style = isSystemCurrentlyLight ? settings.wallpaperStyleLight : settings.wallpaperStyleDark;
-            if (auto e = SetWallpaperViaRegistry(wallpaperPath, style) == 0)
+            if (auto e = SetWallpaper(wallpaperPath, style) == 0)
             {
                 Logger::info(L"[LightSwitchService] Wallpaper changed.");
             }

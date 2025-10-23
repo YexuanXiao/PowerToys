@@ -1,11 +1,9 @@
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <logger/logger_settings.h>
 #include <logger/logger.h>
 #include <utils/logger_helper.h>
 #include "ThemeHelper.h"
-#include <array>
-#include <string>
-#include <wil/resource.h>
 
 // Controls changing the themes.
 
@@ -113,88 +111,295 @@ bool GetCurrentAppsTheme()
     return value == 1; // true = light, false = dark
 }
 
-std::array<std::wstring, 2u> getStyleValue(int style) noexcept
-{
-    switch (style)
-    {
-    case 0: // Fill
-        return { L"10", L"0" };
-    case 1: // Fit
-        return { L"6", L"0" };
-    case 2: // Stretch
-        return { L"2", L"0" };
-    case 3: // Tile
-        return { L"0", L"1" };
-    case 4: // Center
-        return { L"0", L"0" };
-    case 5: // Span
-        return { L"22", L"0" };
-    default:
-        std::terminate();
-    }
-}
+#include <atomic>
+#include <charconv>
+#include <array>
+#include <string>
+#include <wil/resource.h>
 
-int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
+bool GetWindowsVersionFromRegistryInternal(int& build, int& revision) noexcept
 {
-    HKEY hKeyDesktop{};
-    HKEY hKeyWallpapers{};
-
-    auto closeKey = wil::scope_exit([&hKeyDesktop, &hKeyWallpapers]() {
-        if (RegCloseKey(hKeyDesktop) != ERROR_SUCCESS)
+    HKEY hKey{};
+    auto closeKey = wil::scope_exit([&hKey]() {
+        if (RegCloseKey(hKey) != ERROR_SUCCESS)
         {
             std::terminate();
         }
-        if (RegCloseKey(hKeyWallpapers) != ERROR_SUCCESS)
+    });
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+    {
+        return false;
+    }
+    wchar_t buffer[11]{};
+    DWORD bufferSize{ sizeof(buffer) };
+    if (RegGetValueW(hKey, nullptr, L"CurrentBuildNumber", RRF_RT_REG_SZ, nullptr, static_cast<void*>(buffer), &bufferSize))
+    {
+        return false;
+    }
+    char bufferA[11]{};
+    std::transform(std::begin(buffer), std::end(buffer), std::begin(bufferA), [](auto c) { return static_cast<char>(c); });
+    int bld{};
+    if (std::from_chars(bufferA, bufferA + sizeof(bufferA), bld).ec != std::errc{})
+    {
+        return false;
+    }
+    DWORD rev{};
+    DWORD revSize{ sizeof(rev) };
+    if (RegGetValueW(hKey, nullptr, L"UBR", RRF_RT_DWORD, nullptr, &rev, &revSize) != ERROR_SUCCESS)
+    {
+        return false;
+    }
+    revision = static_cast<int>(rev);
+    build = static_cast<int>(bld);
+    return true;
+}
+
+bool GetWindowsVersionFromRegistry(int& build, int& revision) noexcept
+{
+    static std::atomic<int> buildCache{};
+    static std::atomic<int> revcache{};
+
+    if (auto bld = buildCache.load(); bld != 0)
+    {
+        build = bld;
+        revision = revcache.load();
+        return true;
+    }
+
+    int bld{};
+    int rev{};
+    if (auto e = GetWindowsVersionFromRegistryInternal(bld, rev); e == false)
+    {
+        return e;
+    }
+    build = bld;
+    revision = rev;
+    revcache.store(rev);
+    // Write after rev for condition
+    buildCache.store(bld);
+    return true;
+}
+
+// This function will supplement the wallpaper path setting. It does not cause the wallpaper to change, but for consistency, it is better to set it
+int SetRemainWallpaperPathRegistry(std::wstring const& wallpaperPath) noexcept
+{
+    HKEY hKey{};
+
+    auto closeKey = wil::scope_exit([&hKey]() {
+        if (RegCloseKey(hKey) != ERROR_SUCCESS)
         {
             std::terminate();
         }
     });
 
-    auto [styleValue, tileValue] = getStyleValue(style);
-
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_WRITE, &hKeyDesktop) != ERROR_SUCCESS)
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Wallpapers", 0, KEY_WRITE, &hKey) != ERROR_SUCCESS)
     {
-        return 1;
+        return 0x301;
     }
-
-    if (RegSetValueExW(hKeyDesktop, L"Wallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
+    if (RegSetValueExW(hKey, L"CurrentWallpaperPath", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
     {
-        return 2;
+        return 0x302;
     }
-
-    if (RegSetValueExW(hKeyDesktop, L"WallpaperStyle", 0, REG_SZ, reinterpret_cast<const BYTE*>(styleValue.data()), static_cast<DWORD>(styleValue.size() + 1u)) != ERROR_SUCCESS)
-    {
-        return 3;
-    }
-
-    if (RegSetValueExW(hKeyDesktop, L"TileWallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(tileValue.data()), static_cast<DWORD>(tileValue.size() + 1u)) != ERROR_SUCCESS)
-    {
-        return 4;
-    }
-
-    // Another wallpaper path cache
-    // If it is not executed, the wallpaper will revert after switching to another virtual desktop
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Wallpapers", 0, KEY_WRITE, &hKeyWallpapers) != ERROR_SUCCESS)
-    {
-        return 5;
-    }
-
-    if (RegSetValueExW(hKeyWallpapers, L"CurrentWallpaperPath", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
-    {
-        return 6;
-    }
-
     DWORD backgroundType = 0; // 0 = picture, 1 = solid color, 2 = slideshow
-    if (RegSetValueExW(hKeyWallpapers, L"BackgroundType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&backgroundType), static_cast<DWORD>(sizeof(DWORD))) != ERROR_SUCCESS)
+    if (RegSetValueExW(hKey, L"BackgroundType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&backgroundType), static_cast<DWORD>(sizeof(DWORD))) != ERROR_SUCCESS)
     {
-        return 7;
+        return 0x303;
     }
+    return 0;
+}
 
+// After setting the wallpaper using this method, switching to other virtual desktops will cause the wallpaper to be restored
+int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
+{
+    auto [styleValue, tileValue] = [style]() -> std::array<std::wstring, 2u> {
+        switch (style)
+        {
+        case 0: // Fill
+            return { L"10", L"0" };
+        case 1: // Fit
+            return { L"6", L"0" };
+        case 2: // Stretch
+            return { L"2", L"0" };
+        case 3: // Tile
+            return { L"0", L"1" };
+        case 4: // Center
+            return { L"0", L"0" };
+        case 5: // Span
+            return { L"22", L"0" };
+        default:
+            std::terminate();
+        }
+    }();
+
+    HKEY hKey{};
+
+    auto closeKey = wil::scope_exit([&hKey]() {
+        if (RegCloseKey(hKey) != ERROR_SUCCESS)
+        {
+            std::terminate();
+        }
+    });
+
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_WRITE, &hKey) != ERROR_SUCCESS)
+    {
+        return 0x101;
+    }
+    if (RegSetValueExW(hKey, L"Wallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
+    {
+        return 0x102;
+    }
+    if (RegSetValueExW(hKey, L"WallpaperStyle", 0, REG_SZ, reinterpret_cast<const BYTE*>(styleValue.data()), static_cast<DWORD>(styleValue.size() + 1u)) != ERROR_SUCCESS)
+    {
+        return 0x103;
+    }
+    if (RegSetValueExW(hKey, L"TileWallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(tileValue.data()), static_cast<DWORD>(tileValue.size() + 1u)) != ERROR_SUCCESS)
+    {
+        return 0x104;
+    }
     // notify the system about the change
     if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) == 0)
     {
-        return 8;
+        return 0x105;
     }
+    return 0;
+}
 
+#define WIN32_LEAN_AND_MEAN
+#define COM_NO_WINDOWS_H
+#include <string>
+#include <unknwn.h>
+#include <inspectable.h>
+#include <restrictederrorinfo.h>
+#include "Shobjidl.h"
+#include <hstring.h>
+#include <winrt/base.h>
+
+#pragma comment(lib, "runtimeobject.lib")
+
+// COM interface definition from https://github.com/MScholtes/VirtualDesktop
+
+namespace Guids
+{
+    inline constexpr GUID CLSID_ImmersiveShell{ 0xC2F03A33, 0x21F5, 0x47FA, { 0xB4, 0xBB, 0x15, 0x63, 0x62, 0xA2, 0xF2, 0x39 } };
+    inline constexpr GUID CLSID_VirtualDesktopManagerInternal{ 0xC5E0CDCA, 0x7B6E, 0x41B2, { 0x9F, 0xC4, 0xD9, 0x39, 0x75, 0xCC, 0x46, 0x7B } };
+};
+
+struct __declspec(uuid("6D5140C1-7436-11CE-8034-00AA006009FA")) IServiceProvider10 : public IUnknown
+{
+    virtual HRESULT __stdcall QueryService(REFGUID service, REFIID riid, void** obj) = 0;
+};
+
+#undef CreateDesktop
+
+struct __declspec(uuid("53F5CA0B-158F-4124-900C-057158060B27")) IVirtualDesktopManagerInternal24H2 : public IUnknown
+{
+    virtual HRESULT __stdcall GetCount(int* count) = 0;
+    virtual HRESULT __stdcall MoveViewToDesktop(IInspectable* view, IUnknown* desktop) = 0;
+    virtual HRESULT __stdcall CanViewMoveDesktops(IInspectable* view, bool* result) = 0;
+    virtual HRESULT __stdcall GetCurrentDesktop(IUnknown** desktop) = 0;
+    virtual HRESULT __stdcall GetDesktops(IObjectArray** desktops) = 0;
+    virtual HRESULT __stdcall GetAdjacentDesktop(IUnknown* from, int direction, IUnknown** desktop) = 0;
+    virtual HRESULT __stdcall SwitchDesktop(IUnknown* desktop) = 0;
+    virtual HRESULT __stdcall SwitchDesktopAndMoveForegroundView(IUnknown* desktop) = 0;
+    virtual HRESULT __stdcall CreateDesktop(IUnknown** desktop) = 0;
+    virtual HRESULT __stdcall MoveDesktop(IUnknown* desktop, int nIndex) = 0;
+    virtual HRESULT __stdcall RemoveDesktop(IUnknown* desktop, IUnknown* fallback) = 0;
+    virtual HRESULT __stdcall FindDesktop(const GUID* desktopid, IUnknown** desktop) = 0;
+    virtual HRESULT __stdcall GetDesktopSwitchIncludeExcludeViews(IUnknown* desktop, IObjectArray** unknown1, IObjectArray** unknown2) = 0;
+    virtual HRESULT __stdcall SetDesktopName(IUnknown* desktop, HSTRING name) = 0;
+    virtual HRESULT __stdcall SetDesktopWallpaper(IUnknown* desktop, HSTRING path) = 0;
+    virtual HRESULT __stdcall UpdateWallpaperPathForAllDesktops(HSTRING path) = 0;
+    virtual HRESULT __stdcall CopyDesktopState(IInspectable* pView0, IInspectable* pView1) = 0;
+    virtual HRESULT __stdcall CreateRemoteDesktop(HSTRING path, IUnknown** desktop) = 0;
+    virtual HRESULT __stdcall SwitchRemoteDesktop(IUnknown* desktop, void* switchtype) = 0;
+    virtual HRESULT __stdcall SwitchDesktopWithAnimation(IUnknown* desktop) = 0;
+    virtual HRESULT __stdcall GetLastActiveDesktop(IUnknown** desktop) = 0;
+    virtual HRESULT __stdcall WaitForAnimationToComplete() = 0;
+};
+
+// Using this method to set the wallpaper works across virtual desktops, but it does not provide the functionality to set the style
+int SetWallpapaerViaIVirtualDesktopManagerInternal(const std::wstring& path) noexcept
+{
+    int build{};
+    int revision{};
+    if (!GetWindowsVersionFromRegistry(build, revision))
+    {
+        return 0x201;
+    }
+    // Unstable Windows internal API, at least 24H2 required
+    if (build < 26100)
+    {
+        return 0x202;
+    }
+    auto shell = winrt::try_create_instance<IServiceProvider10>(Guids::CLSID_ImmersiveShell, CLSCTX_LOCAL_SERVER);
+    if (!shell)
+    {
+        return 0x203;
+    }
+    winrt::com_ptr<IVirtualDesktopManagerInternal24H2> virtualDesktopManagerInternal;
+    if (shell->QueryService(
+            Guids::CLSID_VirtualDesktopManagerInternal,
+            __uuidof(IVirtualDesktopManagerInternal24H2),
+            virtualDesktopManagerInternal.put_void()) != S_OK)
+    {
+        return 0x204;
+    }
+    if (virtualDesktopManagerInternal->UpdateWallpaperPathForAllDesktops(static_cast<HSTRING>(winrt::detach_abi(path))) != S_OK)
+    {
+        return 0x205;
+    }
+    return 0;
+}
+
+// After setting the wallpaper using this method, switching to other virtual desktops will cause the wallpaper to be restored
+int SetWallpaperViaIDesktopWallpaper(const std::wstring& path, int style) noexcept
+{
+    switch (style)
+    {
+    case 0: // Fill
+    case 1: // Fit
+    case 2: // Stretch
+    case 3: // Tile
+    case 4: // Center
+    case 5: // Span
+        break;
+    default:
+        std::terminate();
+    }
+    auto desktopWallpaper = winrt::try_create_instance<IDesktopWallpaper>(__uuidof(DesktopWallpaper), CLSCTX_LOCAL_SERVER);
+    if (!desktopWallpaper)
+    {
+        return 0x301;
+    }
+    if (desktopWallpaper->SetPosition(static_cast<DESKTOP_WALLPAPER_POSITION>(style)) != S_OK)
+    {
+        return 0x302;
+    }
+    if (desktopWallpaper->SetWallpaper(nullptr, path.c_str()) != S_OK)
+    {
+        return 0x303;
+    }
+    return 0;
+}
+
+int SetWallpaper(const std::wstring& path, int style) noexcept
+{
+    winrt::init_apartment();
+    auto uninit = wil::scope_exit([] {
+        winrt::uninit_apartment();
+    });
+
+    if (auto e = SetWallpaperViaIDesktopWallpaper(path, style) != 0)
+    {
+        return e;
+    }
+    if (auto e = SetWallpapaerViaIVirtualDesktopManagerInternal(path) != 0)
+    {
+        return e;
+    }
+    if (auto e = SetRemainWallpaperPathRegistry(path) != 0)
+    {
+        return e;
+    }
     return 0;
 }

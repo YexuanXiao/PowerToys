@@ -555,7 +555,7 @@ public:
                 {
                     std::wstring const& wallpaperPath = !current_system_theme ? g_settings.m_wallpaper_path_light : g_settings.m_wallpaper_path_dark;
                     auto style = !current_system_theme ? g_settings.m_wallpaper_style_light : g_settings.m_wallpaper_style_dark;
-                    if (auto e = SetWallpaperViaRegistry(wallpaperPath, style) == 0)
+                    if (auto e = SetWallpaper(wallpaperPath, style) == 0)
                     {
                         Logger::info(L"[LightSwitchService] Wallpaper changed.");
                     }

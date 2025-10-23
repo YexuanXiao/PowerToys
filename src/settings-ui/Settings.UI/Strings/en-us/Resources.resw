@@ -5392,6 +5392,9 @@ To record a specific window, enter the hotkey with the Alt key in the opposite m
   <data name="LightSwitch_WallpaperStyle.Header" xml:space="preserve">
     <value>Choose fits for your desktop images</value>
   </data>
+  <data name="LightSwitchDectectWindows24H2Info.Text" xml:space="preserve">
+    <value>It has been detected that your Windows version is earlier than 24H2. On such versions, the wallpapers on virtual desktops may not display correctly. If you are using virtual desktops, it is not recommended to enable this feature. Alternatively, upgrade your Windows version to 24H2 or later for the best experience.</value>
+  </data>
   <data name="Close_NavViewItem.Content" xml:space="preserve">
     <value>Close PowerToys</value>
     <comment>Don't loc "PowerToys"</comment>
