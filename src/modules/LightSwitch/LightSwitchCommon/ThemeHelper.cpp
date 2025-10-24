@@ -6,7 +6,7 @@
 #include "ThemeHelper.h"
 #include <wil/resource.h>
 
-auto RegKeyGuard(HKEY& hKey)
+static auto RegKeyGuard(HKEY& hKey) noexcept
 {
     return wil::scope_exit([&hKey]() {
         if (auto e = RegCloseKey(hKey); e != ERROR_SUCCESS && e != ERROR_INVALID_HANDLE)
@@ -17,7 +17,7 @@ auto RegKeyGuard(HKEY& hKey)
 }
 
 // Controls changing the themes.
-static void ResetColorPrevalence()
+static void ResetColorPrevalence() noexcept
 {
     HKEY hKey{};
     auto closeKey{ RegKeyGuard(hKey) };
@@ -38,7 +38,7 @@ static void ResetColorPrevalence()
     }
 }
 
-void SetAppsTheme(bool mode)
+void SetAppsTheme(bool mode) noexcept
 {
     HKEY hKey{};
     auto closeKey{ RegKeyGuard(hKey) };
@@ -57,7 +57,7 @@ void SetAppsTheme(bool mode)
     }
 }
 
-void SetSystemTheme(bool mode)
+void SetSystemTheme(bool mode) noexcept
 {
     HKEY hKey{};
     auto closeKey{ RegKeyGuard(hKey) };
@@ -83,7 +83,7 @@ void SetSystemTheme(bool mode)
 }
 
 // Can think of this as "is the current theme light?"
-bool GetCurrentSystemTheme()
+bool GetCurrentSystemTheme() noexcept
 {
     HKEY hKey{};
     auto closeKey{ RegKeyGuard(hKey) };
@@ -102,7 +102,7 @@ bool GetCurrentSystemTheme()
     return value == 1; // true = light, false = dark
 }
 
-bool GetCurrentAppsTheme()
+bool GetCurrentAppsTheme() noexcept
 {
     HKEY hKey{};
     auto closeKey{ RegKeyGuard(hKey) };
@@ -126,7 +126,7 @@ bool GetCurrentAppsTheme()
 #include <array>
 #include <string>
 
-bool GetWindowsVersionFromRegistryInternal(int& build, int& revision) noexcept
+static bool GetWindowsVersionFromRegistryInternal(int& build, int& revision) noexcept
 {
     HKEY hKey{};
     auto closeKey{ RegKeyGuard(hKey) };
@@ -158,7 +158,7 @@ bool GetWindowsVersionFromRegistryInternal(int& build, int& revision) noexcept
     return true;
 }
 
-bool GetWindowsVersionFromRegistry(int& build, int& revision) noexcept
+static bool GetWindowsVersionFromRegistry(int& build, int& revision) noexcept
 {
     static std::atomic<int> build_cache{};
     static std::atomic<int> rev_cache{};
@@ -185,7 +185,7 @@ bool GetWindowsVersionFromRegistry(int& build, int& revision) noexcept
 }
 
 // This function will supplement the wallpaper path setting. It does not cause the wallpaper to change, but for consistency, it is better to set it
-int SetRemainWallpaperPathRegistry(std::wstring const& wallpaperPath) noexcept
+static int SetRemainWallpaperPathRegistry(std::wstring const& wallpaperPath) noexcept
 {
     HKEY hKey{};
     auto closeKey{ RegKeyGuard(hKey) };
@@ -209,7 +209,7 @@ int SetRemainWallpaperPathRegistry(std::wstring const& wallpaperPath) noexcept
 }
 
 // After setting the wallpaper using this method, switching to other virtual desktops will cause the wallpaper to be restored
-int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
+static int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
 {
     auto [styleValue, tileValue] = [style]() -> std::array<std::wstring, 2u> {
         switch (style)
@@ -272,20 +272,17 @@ int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexce
 
 // COM interface definition from https://github.com/MScholtes/VirtualDesktop
 
-namespace Guids
-{
-    inline constexpr GUID CLSID_ImmersiveShell{ 0xC2F03A33, 0x21F5, 0x47FA, { 0xB4, 0xBB, 0x15, 0x63, 0x62, 0xA2, 0xF2, 0x39 } };
-    inline constexpr GUID CLSID_VirtualDesktopManagerInternal{ 0xC5E0CDCA, 0x7B6E, 0x41B2, { 0x9F, 0xC4, 0xD9, 0x39, 0x75, 0xCC, 0x46, 0x7B } };
-};
+inline constexpr GUID CLSID_ImmersiveShell{ 0xC2F03A33, 0x21F5, 0x47FA, { 0xB4, 0xBB, 0x15, 0x63, 0x62, 0xA2, 0xF2, 0x39 } };
+inline constexpr GUID CLSID_VirtualDesktopManagerInternal{ 0xC5E0CDCA, 0x7B6E, 0x41B2, { 0x9F, 0xC4, 0xD9, 0x39, 0x75, 0xCC, 0x46, 0x7B } };
 
-struct __declspec(uuid("6D5140C1-7436-11CE-8034-00AA006009FA")) IServiceProvider10 : public IUnknown
+struct __declspec(novtable) __declspec(uuid("6D5140C1-7436-11CE-8034-00AA006009FA")) IServiceProvider10 : public IUnknown
 {
     virtual HRESULT __stdcall QueryService(REFGUID service, REFIID riid, void** obj) = 0;
 };
 
 #undef CreateDesktop
 
-struct __declspec(uuid("53F5CA0B-158F-4124-900C-057158060B27")) IVirtualDesktopManagerInternal24H2 : public IUnknown
+struct __declspec(novtable) __declspec(uuid("53F5CA0B-158F-4124-900C-057158060B27")) IVirtualDesktopManagerInternal24H2 : public IUnknown
 {
     virtual HRESULT __stdcall GetCount(int* count) = 0;
     virtual HRESULT __stdcall MoveViewToDesktop(IInspectable* view, IUnknown* desktop) = 0;
@@ -312,7 +309,7 @@ struct __declspec(uuid("53F5CA0B-158F-4124-900C-057158060B27")) IVirtualDesktopM
 };
 
 // Using this method to set the wallpaper works across virtual desktops, but it does not provide the functionality to set the style
-int SetWallpaperViaIVirtualDesktopManagerInternal(const std::wstring& path) noexcept
+static int SetWallpaperViaIVirtualDesktopManagerInternal(const std::wstring& path) noexcept
 {
     int build{};
     int revision{};
@@ -325,14 +322,14 @@ int SetWallpaperViaIVirtualDesktopManagerInternal(const std::wstring& path) noex
     {
         return 0x202;
     }
-    auto shell = winrt::try_create_instance<IServiceProvider10>(Guids::CLSID_ImmersiveShell, CLSCTX_LOCAL_SERVER);
+    auto shell = winrt::try_create_instance<IServiceProvider10>(CLSID_ImmersiveShell, CLSCTX_LOCAL_SERVER);
     if (!shell)
     {
         return 0x203;
     }
     winrt::com_ptr<IVirtualDesktopManagerInternal24H2> virtualDesktopManagerInternal;
     if (shell->QueryService(
-            Guids::CLSID_VirtualDesktopManagerInternal,
+            CLSID_VirtualDesktopManagerInternal,
             __uuidof(IVirtualDesktopManagerInternal24H2),
             virtualDesktopManagerInternal.put_void()) != S_OK)
     {
@@ -346,7 +343,7 @@ int SetWallpaperViaIVirtualDesktopManagerInternal(const std::wstring& path) noex
 }
 
 // After setting the wallpaper using this method, switching to other virtual desktops will cause the wallpaper to be restored
-int SetWallpaperViaIDesktopWallpaper(const std::wstring& path, int style) noexcept
+static int SetWallpaperViaIDesktopWallpaper(const std::wstring& path, int style) noexcept
 {
     switch (style)
     {
