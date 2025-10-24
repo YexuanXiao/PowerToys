@@ -208,56 +208,6 @@ static int SetRemainWallpaperPathRegistry(std::wstring const& wallpaperPath) noe
     return 0;
 }
 
-// After setting the wallpaper using this method, switching to other virtual desktops will cause the wallpaper to be restored
-static int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexcept
-{
-    auto [styleValue, tileValue] = [style]() -> std::array<std::wstring, 2u> {
-        switch (style)
-        {
-        case 0: // Fill
-            return { L"10", L"0" };
-        case 1: // Fit
-            return { L"6", L"0" };
-        case 2: // Stretch
-            return { L"2", L"0" };
-        case 3: // Tile
-            return { L"0", L"1" };
-        case 4: // Center
-            return { L"0", L"0" };
-        case 5: // Span
-            return { L"22", L"0" };
-        default:
-            std::terminate();
-        }
-    }();
-
-    HKEY hKey{};
-    auto closeKey{ RegKeyGuard(hKey) };
-
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_WRITE, &hKey) != ERROR_SUCCESS)
-    {
-        return 0x101;
-    }
-    if (RegSetValueExW(hKey, L"Wallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
-    {
-        return 0x102;
-    }
-    if (RegSetValueExW(hKey, L"WallpaperStyle", 0, REG_SZ, reinterpret_cast<const BYTE*>(styleValue.data()), static_cast<DWORD>(styleValue.size() + 1u)) != ERROR_SUCCESS)
-    {
-        return 0x103;
-    }
-    if (RegSetValueExW(hKey, L"TileWallpaper", 0, REG_SZ, reinterpret_cast<const BYTE*>(tileValue.data()), static_cast<DWORD>(tileValue.size() + 1u)) != ERROR_SUCCESS)
-    {
-        return 0x104;
-    }
-    // notify the system about the change
-    if (SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) == 0)
-    {
-        return 0x105;
-    }
-    return 0;
-}
-
 #define WIN32_LEAN_AND_MEAN
 #define COM_NO_WINDOWS_H
 #include <string>
