@@ -557,7 +557,7 @@ public:
                     auto style = !current_system_theme ? g_settings.m_wallpaper_style_light : g_settings.m_wallpaper_style_dark;
                     if (auto e = SetWallpaper(wallpaperPath, style) == 0)
                     {
-                        Logger::info(L"[LightSwitchService] Wallpaper changed.");
+                        Logger::info(L"[LightSwitchService] Wallpaper is changed to {}.", wallpaperPath);
                     }
                     else
                     {

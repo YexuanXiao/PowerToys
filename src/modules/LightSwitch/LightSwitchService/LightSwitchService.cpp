@@ -184,24 +184,28 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         bool isAppsCurrentlyLight = GetCurrentAppsTheme();
 
         // Call before SetTheme to take advantage of the additional notifications they perform
-        if (settings.wallpaperEnabled && settings.changeSystem)
-        {
-            std::wstring const& wallpaperPath = isSystemCurrentlyLight ? settings.wallpaperPathLight : settings.wallpaperPathDark;
-            auto style = isSystemCurrentlyLight ? settings.wallpaperStyleLight : settings.wallpaperStyleDark;
-            if (auto e = SetWallpaper(wallpaperPath, style) == 0)
+        auto applyWallpaper = [settings](bool light) {
+            // true is light, false is dark
+            if (settings.wallpaperEnabled)
             {
-                Logger::info(L"[LightSwitchService] Wallpaper changed.");
+                std::wstring const& wallpaperPath = light ? settings.wallpaperPathLight : settings.wallpaperPathDark;
+                auto style = light ? settings.wallpaperStyleLight : settings.wallpaperStyleDark;
+                if (auto e = SetWallpaper(wallpaperPath, style) == 0)
+                {
+                    Logger::info(L"[LightSwitchService] Wallpaper is changed to {}.", wallpaperPath);
+                }
+                else
+                {
+                    Logger::error(L"[LightSwitchService] Failed to set wallpaper, error: {}.", e);
+                }
             }
-            else
-            {
-                Logger::error(L"[LightSwitchService] Failed to set wallpaper, error: {}.", e);
-            }
-        }
+        };
 
         if (isLightActive)
         {
             if (settings.changeSystem && !isSystemCurrentlyLight)
             {
+                applyWallpaper(true);
                 SetSystemTheme(true);
                 Logger::info(L"[LightSwitchService] Changing system theme to light mode.");
             }
@@ -215,6 +219,7 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         {
             if (settings.changeSystem && isSystemCurrentlyLight)
             {
+                applyWallpaper(false);
                 SetSystemTheme(false);
                 Logger::info(L"[LightSwitchService] Changing system theme to dark mode.");
             }

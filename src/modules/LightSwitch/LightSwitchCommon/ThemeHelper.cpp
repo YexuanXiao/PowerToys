@@ -4,12 +4,23 @@
 #include <logger/logger.h>
 #include <utils/logger_helper.h>
 #include "ThemeHelper.h"
+#include <wil/resource.h>
+
+auto RegKeyGuard(HKEY& hKey)
+{
+    return wil::scope_exit([&hKey]() {
+        if (auto e = RegCloseKey(hKey); e != ERROR_SUCCESS && e != ERROR_INVALID_HANDLE)
+        {
+            std::terminate();
+        }
+    });
+}
 
 // Controls changing the themes.
-
 static void ResetColorPrevalence()
 {
-    HKEY hKey;
+    HKEY hKey{};
+    auto closeKey{ RegKeyGuard(hKey) };
     if (RegOpenKeyEx(HKEY_CURRENT_USER,
                      L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
                      0,
@@ -18,7 +29,6 @@ static void ResetColorPrevalence()
     {
         DWORD value = 0; // back to default value
         RegSetValueEx(hKey, L"ColorPrevalence", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
-        RegCloseKey(hKey);
 
         SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, reinterpret_cast<LPARAM>(L"ImmersiveColorSet"), SMTO_ABORTIFHUNG, 5000, nullptr);
 
@@ -30,7 +40,8 @@ static void ResetColorPrevalence()
 
 void SetAppsTheme(bool mode)
 {
-    HKEY hKey;
+    HKEY hKey{};
+    auto closeKey{ RegKeyGuard(hKey) };
     if (RegOpenKeyEx(HKEY_CURRENT_USER,
                      L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
                      0,
@@ -39,7 +50,6 @@ void SetAppsTheme(bool mode)
     {
         DWORD value = mode;
         RegSetValueEx(hKey, L"AppsUseLightTheme", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
-        RegCloseKey(hKey);
 
         SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, reinterpret_cast<LPARAM>(L"ImmersiveColorSet"), SMTO_ABORTIFHUNG, 5000, nullptr);
 
@@ -49,7 +59,8 @@ void SetAppsTheme(bool mode)
 
 void SetSystemTheme(bool mode)
 {
-    HKEY hKey;
+    HKEY hKey{};
+    auto closeKey{ RegKeyGuard(hKey) };
     if (RegOpenKeyEx(HKEY_CURRENT_USER,
                      L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
                      0,
@@ -58,7 +69,6 @@ void SetSystemTheme(bool mode)
     {
         DWORD value = mode;
         RegSetValueEx(hKey, L"SystemUsesLightTheme", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&value), sizeof(value));
-        RegCloseKey(hKey);
 
         if (mode) // if are changing to light mode
         {
@@ -75,7 +85,8 @@ void SetSystemTheme(bool mode)
 // Can think of this as "is the current theme light?"
 bool GetCurrentSystemTheme()
 {
-    HKEY hKey;
+    HKEY hKey{};
+    auto closeKey{ RegKeyGuard(hKey) };
     DWORD value = 1; // default = light
     DWORD size = sizeof(value);
 
@@ -86,7 +97,6 @@ bool GetCurrentSystemTheme()
                      &hKey) == ERROR_SUCCESS)
     {
         RegQueryValueEx(hKey, L"SystemUsesLightTheme", nullptr, nullptr, reinterpret_cast<LPBYTE>(&value), &size);
-        RegCloseKey(hKey);
     }
 
     return value == 1; // true = light, false = dark
@@ -94,7 +104,8 @@ bool GetCurrentSystemTheme()
 
 bool GetCurrentAppsTheme()
 {
-    HKEY hKey;
+    HKEY hKey{};
+    auto closeKey{ RegKeyGuard(hKey) };
     DWORD value = 1;
     DWORD size = sizeof(value);
 
@@ -105,7 +116,6 @@ bool GetCurrentAppsTheme()
                      &hKey) == ERROR_SUCCESS)
     {
         RegQueryValueEx(hKey, L"AppsUseLightTheme", nullptr, nullptr, reinterpret_cast<LPBYTE>(&value), &size);
-        RegCloseKey(hKey);
     }
 
     return value == 1; // true = light, false = dark
@@ -115,17 +125,11 @@ bool GetCurrentAppsTheme()
 #include <charconv>
 #include <array>
 #include <string>
-#include <wil/resource.h>
 
 bool GetWindowsVersionFromRegistryInternal(int& build, int& revision) noexcept
 {
     HKEY hKey{};
-    auto closeKey = wil::scope_exit([&hKey]() {
-        if (RegCloseKey(hKey) != ERROR_SUCCESS)
-        {
-            std::terminate();
-        }
-    });
+    auto closeKey{ RegKeyGuard(hKey) };
     if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
     {
         return false;
@@ -184,26 +188,22 @@ bool GetWindowsVersionFromRegistry(int& build, int& revision) noexcept
 int SetRemainWallpaperPathRegistry(std::wstring const& wallpaperPath) noexcept
 {
     HKEY hKey{};
-
-    auto closeKey = wil::scope_exit([&hKey]() {
-        if (RegCloseKey(hKey) != ERROR_SUCCESS)
-        {
-            std::terminate();
-        }
-    });
+    auto closeKey{ RegKeyGuard(hKey) };
 
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Wallpapers", 0, KEY_WRITE, &hKey) != ERROR_SUCCESS)
     {
-        return 0x301;
+        // The key may not exist after updating Windows, so it is not an error
+        // The key will be created by the Settings app
+        return 0;
     }
     if (RegSetValueExW(hKey, L"CurrentWallpaperPath", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperPath.data()), static_cast<DWORD>((wallpaperPath.size() + 1u) * sizeof(wchar_t))) != ERROR_SUCCESS)
     {
-        return 0x302;
+        return 0x301;
     }
     DWORD backgroundType = 0; // 0 = picture, 1 = solid color, 2 = slideshow
     if (RegSetValueExW(hKey, L"BackgroundType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&backgroundType), static_cast<DWORD>(sizeof(DWORD))) != ERROR_SUCCESS)
     {
-        return 0x303;
+        return 0x302;
     }
     return 0;
 }
@@ -232,13 +232,7 @@ int SetWallpaperViaRegistry(std::wstring const& wallpaperPath, int style) noexce
     }();
 
     HKEY hKey{};
-
-    auto closeKey = wil::scope_exit([&hKey]() {
-        if (RegCloseKey(hKey) != ERROR_SUCCESS)
-        {
-            std::terminate();
-        }
-    });
+    auto closeKey{ RegKeyGuard(hKey) };
 
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_WRITE, &hKey) != ERROR_SUCCESS)
     {
