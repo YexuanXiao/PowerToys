@@ -211,6 +211,7 @@
                                                 Grid.Column="0"
                                                 VerticalAlignment="Center"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap"
                                                 Visibility="{x:Bind ViewModel.IsLightWallpaperValid, Converter={StaticResource BoolToInvertedVisibilityConverter}, Mode=OneWay}" />
                                             <Image
                                                 Grid.Row="0"
@@ -224,6 +225,7 @@
                                                 Grid.Column="2"
                                                 VerticalAlignment="Center"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap"
                                                 Visibility="{x:Bind ViewModel.IsDarkWallpaperValid, Converter={StaticResource BoolToInvertedVisibilityConverter}, Mode=OneWay}" />
                                             <Image
                                                 Grid.Row="0"
@@ -291,7 +293,7 @@
                                         </StackPanel>
                                     </tkcontrols:SettingsCard>
                                     <tkcontrols:SettingsCard x:Uid="LightSwitch_WallpaperVirtualDesktop" Visibility="{x:Bind ViewModel.Is24H2OrLater, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneTime}">
-                                        <ToggleSwitch AutomationProperties.AutomationId="Toggle_WallpaperSwitch" IsOn="{x:Bind ViewModel.IsVirtualDesktopEnabled, Mode=TwoWay}" />
+                                        <ToggleSwitch AutomationProperties.AutomationId="Toggle_WallpaperVirtualDesktopSwitch" IsOn="{x:Bind ViewModel.IsVirtualDesktopEnabled, Mode=TwoWay}" />
                                     </tkcontrols:SettingsCard>
                                     <tkcontrols:SettingsCard Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}" Visibility="{x:Bind ViewModel.Is24H2OrLater, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneTime}">
                                         <tkcontrols:SettingsCard.Header>
