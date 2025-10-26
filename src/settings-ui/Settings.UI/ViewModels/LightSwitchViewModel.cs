@@ -546,6 +546,23 @@ namespace Microsoft.PowerToys.Settings.UI.ViewModels
             }
         }
 
+        public bool IsVirtualDesktopEnabled
+        {
+            get
+            {
+                return ModuleSettings.Properties.WallpaperVirtualDesktopEnabled.Value;
+            }
+
+            set
+            {
+                if (ModuleSettings.Properties.WallpaperVirtualDesktopEnabled.Value != value)
+                {
+                    ModuleSettings.Properties.WallpaperVirtualDesktopEnabled.Value = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public string WallpaperPathLight
         {
             get

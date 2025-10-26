@@ -184,13 +184,13 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         bool isAppsCurrentlyLight = GetCurrentAppsTheme();
 
         // Call before SetTheme to take advantage of the additional notifications they perform
-        auto applyWallpaper = [settings](bool light) {
+        auto SetWallpaper = [settings](bool light) {
             // true is light, false is dark
             if (settings.wallpaperEnabled)
             {
                 std::wstring const& wallpaperPath = light ? settings.wallpaperPathLight : settings.wallpaperPathDark;
                 auto style = light ? settings.wallpaperStyleLight : settings.wallpaperStyleDark;
-                if (auto e = SetWallpaper(wallpaperPath, style) == 0)
+                if (auto e = SetDesktopWallpaper(wallpaperPath, style, settings.wallpaperVirtualDesktop) == 0)
                 {
                     Logger::info(L"[LightSwitchService] Wallpaper is changed to {}.", wallpaperPath);
                 }
@@ -205,7 +205,7 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         {
             if (settings.changeSystem && !isSystemCurrentlyLight)
             {
-                applyWallpaper(true);
+                SetWallpaper(true);
                 SetSystemTheme(true);
                 Logger::info(L"[LightSwitchService] Changing system theme to light mode.");
             }
@@ -219,7 +219,7 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         {
             if (settings.changeSystem && isSystemCurrentlyLight)
             {
-                applyWallpaper(false);
+                SetWallpaper(false);
                 SetSystemTheme(false);
                 Logger::info(L"[LightSwitchService] Changing system theme to dark mode.");
             }

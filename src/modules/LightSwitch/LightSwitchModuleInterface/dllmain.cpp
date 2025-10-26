@@ -88,6 +88,7 @@ struct ModuleSettings
     std::wstring m_latitude = L"0.0";
     std::wstring m_longitude = L"0.0";
     bool m_wallpaper = false;
+    bool m_wallpaper_virtual_desktop = false;
     int m_wallpaper_style_light = 0;
     int m_wallpaper_style_dark = 0;
     std::wstring m_wallpaper_path_light;
@@ -342,6 +343,10 @@ public:
             {
                 g_settings.m_wallpaper = *v;
             }
+            if (auto v = values.get_bool_value(L"wallpaperVirtualDesktopEnabled"))
+            {
+                g_settings.m_wallpaper_virtual_desktop = *v;
+            }
             if (auto v = values.get_int_value(L"wallpaperStyleLight"))
             {
                 g_settings.m_wallpaper_style_light = *v;
@@ -555,7 +560,7 @@ public:
                 {
                     std::wstring const& wallpaperPath = !current_system_theme ? g_settings.m_wallpaper_path_light : g_settings.m_wallpaper_path_dark;
                     auto style = !current_system_theme ? g_settings.m_wallpaper_style_light : g_settings.m_wallpaper_style_dark;
-                    if (auto e = SetWallpaper(wallpaperPath, style) == 0)
+                    if (auto e = SetDesktopWallpaper(wallpaperPath, style, g_settings.m_wallpaper_virtual_desktop) == 0)
                     {
                         Logger::info(L"[LightSwitchService] Wallpaper is changed to {}.", wallpaperPath);
                     }
@@ -660,6 +665,8 @@ void LightSwitchInterface::init_settings()
             g_settings.m_longitude = *v;
         if (auto v = settings.get_bool_value(L"wallpaperEnabled"))
             g_settings.m_wallpaper = *v;
+        if (auto v = settings.get_bool_value(L"wallpaperVirtualDesktopEnabled"))
+            g_settings.m_wallpaper_virtual_desktop = *v;
         if (auto v = settings.get_int_value(L"wallpaperStyleLight"))
             g_settings.m_wallpaper_style_light = *v;
         if (auto v = settings.get_int_value(L"wallpaperStyleDark"))

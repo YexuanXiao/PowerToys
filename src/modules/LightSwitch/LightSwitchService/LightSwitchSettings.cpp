@@ -179,6 +179,16 @@ void LightSwitchSettings::LoadSettings()
                 NotifyObservers(SettingId::WallpaperEnabled);
             }
         }
+        
+        if (const auto jsonVal = values.get_bool_value(L"wallpaperVirtualDesktopEnabled"))
+        {
+            auto val = *jsonVal;
+            if (m_settings.wallpaperVirtualDesktop != val)
+            {
+                m_settings.wallpaperVirtualDesktop = val;
+                NotifyObservers(SettingId::WallpaperVirtualDesktopEnabled);
+            }
+        }
 
         if (const auto jsonVal = values.get_int_value(L"wallpaperStyleLight"))
         {

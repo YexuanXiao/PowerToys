@@ -323,22 +323,24 @@ static int SetWallpaperViaIDesktopWallpaper(const std::wstring& path, int style)
     return 0;
 }
 
-int SetWallpaper(const std::wstring& path, int style) noexcept
+int SetDesktopWallpaper(const std::wstring& path, int style, bool virtualDesktop) noexcept
 {
     winrt::init_apartment();
     auto uninit = wil::scope_exit([] {
         winrt::uninit_apartment();
     });
-
-    if (auto e = SetWallpaperViaIDesktopWallpaper(path, style) != 0)
+    if (virtualDesktop)
+    {
+        if (auto e = SetWallpaperViaIVirtualDesktopManagerInternal(path); e != 0)
+        {
+            return e;
+        }
+    }
+    if (auto e = SetWallpaperViaIDesktopWallpaper(path, style); e != 0)
     {
         return e;
     }
-    if (auto e = SetWallpaperViaIVirtualDesktopManagerInternal(path) != 0)
-    {
-        return e;
-    }
-    if (auto e = SetRemainWallpaperPathRegistry(path) != 0)
+    if (auto e = SetRemainWallpaperPathRegistry(path); e != 0)
     {
         return e;
     }
